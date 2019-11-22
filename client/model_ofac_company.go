@@ -8,13 +8,12 @@
  */
 
 package openapi
-
-// OFAC Company and metadata
+// OfacCompany OFAC Company and metadata
 type OfacCompany struct {
 	// OFAC Company ID
-	Id        string            `json:"id,omitempty"`
-	Sdn       Sdn               `json:"sdn,omitempty"`
-	Addresses []Address         `json:"addresses,omitempty"`
-	Alts      []Alt             `json:"alts,omitempty"`
-	Status    OfacCompanyStatus `json:"status,omitempty"`
+	Id string `json:"id,omitempty"`
+	Sdn Sdn `json:"sdn,omitempty"`
+	Addresses []Address `json:"addresses,omitempty"`
+	Alts []Alt `json:"alts,omitempty"`
+	Status OfacCompanyStatus `json:"status,omitempty"`
 }

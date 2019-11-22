@@ -8,10 +8,10 @@
  */
 
 package openapi
-
-// Search results containing SDNs, alternate names and/or addreses
+// Search Search results containing SDNs, alternate names and/or addreses
 type Search struct {
-	SDNs      []Sdn     `json:"SDNs,omitempty"`
-	AltNames  []Alt     `json:"altNames,omitempty"`
+	SDNs []Sdn `json:"SDNs,omitempty"`
+	AltNames []Alt `json:"altNames,omitempty"`
 	Addresses []Address `json:"addresses,omitempty"`
+	DeniedPersons []Dpl `json:"deniedPersons,omitempty"`
 }

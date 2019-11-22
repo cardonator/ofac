@@ -8,13 +8,12 @@
  */
 
 package openapi
-
-// Physical address from OFAC list
+// Address Physical address from OFAC list
 type Address struct {
-	EntityID                    string  `json:"entityID,omitempty"`
-	AddressID                   string  `json:"addressID,omitempty"`
-	Address                     string  `json:"address,omitempty"`
-	CityStateProvincePostalCode string  `json:"cityStateProvincePostalCode,omitempty"`
-	Country                     string  `json:"country,omitempty"`
-	Match                       float32 `json:"match,omitempty"`
+	EntityID string `json:"entityID,omitempty"`
+	AddressID string `json:"addressID,omitempty"`
+	Address string `json:"address,omitempty"`
+	CityStateProvincePostalCode string `json:"cityStateProvincePostalCode,omitempty"`
+	Country string `json:"country,omitempty"`
+	Match float32 `json:"match,omitempty"`
 }

@@ -103,6 +103,46 @@ var (
 			},
 		}),
 	}
+	ssiSearcher = &searcher{
+		SSIs: precomputeSSIs([]*ofac.SSI{
+			{
+				EntityID:       "18782",
+				Type:           "Entity",
+				Programs:       []string{"SYRIA", "UKRAINE-EO13662"},
+				Name:           "ROSOBORONEKSPORT OAO",
+				Addresses:      []string{"27 Stromynka ul., Moscow, 107076, RU"},
+				Remarks:        []string{"For more information on directives, please visit the following link: http://www.treasury.gov/resource-center/sanctions/Programs/Pages/ukraine.aspx#directives", "(Linked To: ROSTEC)"},
+				AlternateNames: []string{"RUSSIAN DEFENSE EXPORT ROSOBORONEXPORT", "ROSOBORONEXPORT JSC", "ROSOBORONEKSPORT OJSC", "OJSC ROSOBORONEXPORT", "ROSOBORONEXPORT"},
+				IDsOnRecord:    []string{"1117746521452, Registration ID", "56467052, Government Gazette Number", "7718852163, Tax ID No.", "Subject to Directive 3, Executive Order 13662 Directive Determination -", "www.roe.ru, Website"},
+				SourceListURL:  "http://bit.ly/1QWTIfE",
+				SourceInfoURL:  "http://bit.ly/1MLgou0",
+			},
+			{
+				EntityID:       "18736",
+				Type:           "Entity",
+				Programs:       []string{"UKRAINE-EO13662"},
+				Name:           "VTB SPECIALIZED DEPOSITORY, CJSC",
+				Addresses:      []string{"35 Myasnitskaya Street, Moscow, 101000, RU"},
+				Remarks:        []string{"For more information on directives, please visit the following link: http://www.treasury.gov/resource-center/sanctions/Programs/Pages/ukraine.aspx#directives", "(Linked To: ROSTEC)"},
+				AlternateNames: []string{"CJS VTB SPECIALIZED DEPOSITORY"},
+				IDsOnRecord:    []string{"1117746521452, Registration ID", "56467052, Government Gazette Number", "7718852163, Tax ID No.", "Subject to Directive 3, Executive Order 13662 Directive Determination -", "www.roe.ru, Website"},
+				SourceListURL:  "http://bit.ly/1QWTIfE",
+				SourceInfoURL:  "http://bit.ly/1MLgou0",
+			},
+			//{
+			//	EntityID:       "18737",
+			//	Type:           "Entity",
+			//	Programs:       []string{"UKRAINE-EO13662"},
+			//	Name:           "AL ZAWAHIRI",
+			//	Addresses:      []string{"35 Myasnitskaya Street, Moscow, 101000, RU"},
+			//	Remarks:        []string{"For more information on directives, please visit the following link: http://www.treasury.gov/resource-center/sanctions/Programs/Pages/ukraine.aspx#directives", "(Linked To: ROSTEC)"},
+			//	AlternateNames: []string{"CJS VTB SPECIALIZED DEPOSITORY"},
+			//	IDsOnRecord:    []string{"1117746521452, Registration ID", "56467052, Government Gazette Number", "7718852163, Tax ID No.", "Subject to Directive 3, Executive Order 13662 Directive Determination -", "www.roe.ru, Website"},
+			//	SourceListURL:  "http://bit.ly/1QWTIfE",
+			//	SourceInfoURL:  "http://bit.ly/1MLgou0",
+			//},
+		}),
+	}
 )
 
 func TestJaroWrinkler(t *testing.T) {
@@ -338,13 +378,23 @@ func TestSearch__FindAlts(t *testing.T) {
 	}
 }
 
-func TestSearch__TopAlts(t *testing.T) {
+func TestSearch__TopSdnAlts(t *testing.T) {
 	alts := altSearcher.TopAltNames(1, "SOGO KENKYUSHO")
 	if len(alts) == 0 {
 		t.Fatal("empty AltNames")
 	}
 	if alts[0].AlternateIdentity.EntityID != "4691" {
 		t.Errorf("%#v", alts[0].AlternateIdentity)
+	}
+}
+
+func TestSearcher_TopSSIAlts(t *testing.T) {
+	ssis := ssiSearcher.TopSSIAlts(1, "ROSOBORONEXPORT")
+	if len(ssis) == 0 {
+		t.Fatal("empty SSIs")
+	}
+	if ssis[0].SectoralSanction.Name != "ROSOBORONEKSPORT OAO" {
+		t.Errorf("%#v", ssis[0].SectoralSanction)
 	}
 }
 
@@ -376,5 +426,15 @@ func TestSearch__TopDPs(t *testing.T) {
 	// DPL doesn't have any entity IDs. Comparing expected address components instead
 	if dps[0].DeniedPerson.StreetAddress != "P.O. BOX 28360" || dps[0].DeniedPerson.City != "DUBAI" {
 		t.Errorf("%#v", dps[0].DeniedPerson)
+	}
+}
+
+func TestSearcher_TopSSIs(t *testing.T) {
+	ssis := ssiSearcher.TopSSIs(1, "ROSOBORONEKSPORT")
+	if len(ssis) == 0 {
+		t.Fatal("empty SSIs")
+	}
+	if ssis[0].SectoralSanction.EntityID != "18782" {
+		t.Errorf("%#v", ssis[0].SectoralSanction)
 	}
 }

@@ -27,6 +27,8 @@ var (
 		"dpl.txt", // Denied Persons List (tab separated)
 	}
 	dplURLTemplate = "https://www.bis.doc.gov/dpl/%s"
+
+	cslURL = "https://api.trade.gov/consolidated_screening_list/search.csv?api_key=OHZYuksFHSFao8jDXTkfiypO"
 )
 
 func init() {
@@ -63,6 +65,7 @@ func (dl *Downloader) GetFiles() (string, error) {
 
 	// create a single list containing all filenames and source URLs
 	namesAndSources := make(map[string]string)
+	namesAndSources["csl.csv"] = cslURL
 	for _, fname := range ofacFilenames {
 		namesAndSources[fname] = fmt.Sprintf(ofacURLTemplate, fname)
 	}

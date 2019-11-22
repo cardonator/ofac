@@ -36,6 +36,44 @@ const (
 
 	// deniedPersonsListFile is the Denied Persons List provided by the Bureau of Industry and Security, US Department of Commerce
 	deniedPersonsListFile = "dpl.txt"
+
+	// consolidatedScreeningListFile is the Export.gov file that combines 11 sanctions lists into a single list
+	consolidatedScreeningListFile = "csl.csv"
+
+	// Lists to extract from the Consolidated Screening List:
+	ssiListName = "Sectoral Sanctions Identifications List (SSI) - Treasury Department"
+)
+
+// This is the order of the columns in the CSL
+const (
+	cslSource = iota
+	cslEntityNumber
+	cslType
+	cslPrograms
+	cslName
+	cslTitle
+	cslAddresses
+	cslFRNotice
+	cslStartDate
+	cslEndDate
+	cslStandardOrder
+	cslLicenseRequirement
+	cslLicensePolicy
+	cslCallSign
+	cslVesselType
+	cslGrossTonnage
+	cslGrossRegisteredTonnage
+	cslVesselFlag
+	cslVesselOwner
+	cslRemarks
+	cslSourceListURL
+	cslAltNames
+	cslCitizenships
+	cslDatesOfBirth
+	cslNationalities
+	cslPlacesOfBirth
+	cslSourceInformationURL
+	cslIds
 )
 
 // Error strings specific to parsing/reading an OFAC file
@@ -73,6 +111,8 @@ type Reader struct {
 	SDNComments []*SDNComments `json:"sdnComments"`
 	// DPL returns an array of BIS Denied Persons
 	DeniedPersons []*DPL
+	// SectoralSanctions returns an array of Treasury Dept. Sectoral Sanctions Identifications
+	SectoralSanctions []*SSI
 	// errors holds each error encountered when attempting to parse the file
 	errors base.ErrorList
 }
@@ -114,6 +154,10 @@ func (r *Reader) csvFile() error {
 		}
 	} else if strings.Contains(r.FileName, speciallyDesignatedNationalCommentsFile) {
 		if err := r.csvSDNCommentsFile(); err != nil {
+			return err
+		}
+	} else if strings.Contains(r.FileName, consolidatedScreeningListFile) {
+		if err := r.csvConsolidatedScreeningList(); err != nil {
 			return err
 		}
 	} else {
@@ -259,6 +303,61 @@ func (r *Reader) csvSDNCommentsFile() error {
 		r.SDNComments = append(r.SDNComments, sdnComments)
 	}
 	return nil
+}
+
+func (r *Reader) csvConsolidatedScreeningList() error {
+	f, err := os.Open(r.FileName)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	lines, err := csv.NewReader(f).ReadAll()
+	if err != nil {
+		return err
+	}
+
+	for _, csvLine := range lines {
+		csvLine := replaceNull(csvLine)
+		switch csvLine[cslSource] {
+		case ssiListName:
+			r.SectoralSanctions = append(r.SectoralSanctions, unmarshalSSI(csvLine))
+		default:
+			continue
+		}
+	}
+	return nil
+}
+
+func unmarshalSSI(row []string) *SSI {
+	return &SSI{
+		EntityID:       row[cslEntityNumber],
+		Type:           row[cslType],
+		Programs:       expandProgramsList(row[cslPrograms]),
+		Name:           row[cslName],
+		Addresses:      expandField(row[cslAddresses]),
+		Remarks:        expandField(row[cslRemarks]),
+		AlternateNames: expandField(row[cslAltNames]),
+		IDsOnRecord:    expandField(row[cslIds]),
+		SourceListURL:  row[cslSourceListURL],
+		SourceInfoURL:  row[cslSourceInformationURL],
+	}
+}
+
+func expandField(addrs string) []string {
+	var result []string
+	for _, a := range strings.Split(addrs, ";") {
+		result = append(result, strings.TrimSpace(a))
+	}
+	return result
+}
+
+var prgmReplacer = strings.NewReplacer("]", "", "[", "")
+
+func expandProgramsList(prgms string) []string {
+	prgms = strings.ReplaceAll(prgms, "] [", ";")
+	prgms = prgmReplacer.Replace(prgms)
+	return expandField(prgms)
 }
 
 func (r *Reader) txtFile() error {

@@ -43,6 +43,9 @@ func TestSearcher__refreshData(t *testing.T) {
 	if len(s.SDNs) == 0 || stats.SDNs == 0 {
 		t.Errorf("empty SDNs=%d or stats.SDNs=%d", len(s.SDNs), stats.SDNs)
 	}
+	if len(s.DPs) == 0 || stats.DeniedPersons == 0 {
+		t.Errorf("empty DPs=%d or status.DeniedPersons=%d", len(s.DPs), stats.DeniedPersons)
+	}
 }
 
 func createTestDownloadRepository(t *testing.T) *sqliteDownloadRepository {
@@ -81,6 +84,9 @@ func TestDownload_record(t *testing.T) {
 	}
 	if dl.Addresses != stats.Addresses {
 		t.Errorf("dl.Addresses=%d stats.Addresses=%d", dl.Addresses, stats.Addresses)
+	}
+	if dl.DeniedPersons != stats.DeniedPersons {
+		t.Errorf("dl.DeniedPersons=%d stats.DeniedPersons=%d", dl.DeniedPersons, stats.DeniedPersons)
 	}
 }
 

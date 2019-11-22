@@ -20,3 +20,6 @@ openapi.yaml
 openapi-generator*jar
 
 *.db
+
+# IDE files
+.idea

@@ -14,4 +14,5 @@ type Search struct {
 	AltNames []Alt `json:"altNames,omitempty"`
 	Addresses []Address `json:"addresses,omitempty"`
 	DeniedPersons []Dpl `json:"deniedPersons,omitempty"`
+	SectoralSanctions []Ssi `json:"sectoralSanctions,omitempty"`
 }

@@ -65,6 +65,7 @@ Class | Method | HTTP request | Description
  - [OfacCustomerStatus](docs/OfacCustomerStatus.md)
  - [Sdn](docs/Sdn.md)
  - [Search](docs/Search.md)
+ - [Ssi](docs/Ssi.md)
  - [UpdateCompanyStatus](docs/UpdateCompanyStatus.md)
  - [UpdateCustomerStatus](docs/UpdateCustomerStatus.md)
  - [Watch](docs/Watch.md)

@@ -717,7 +717,6 @@ components:
           example: 0.92
     SSI:
       description: Treasury Department Sectoral Sanctions Identifications List (SSI)
-      $ref: '#/components/schemas/SSI'
       properties:
         entityID:
           type: string
@@ -745,20 +744,20 @@ components:
           example: ["D. Retyum, Luzhski Raion, Leningradskaya Obl., 188230, RU", "Retiun Village, Lujskiy District, Leningrad Region, RU"]
         remarks:
           type: array
-            items:
-              type: string
+          items:
+            type: string
           description: Additional details regarding the entity
           example: ["For more information on directives, please visit the following link: http://www.treasury.gov/resource-center/sanctions/Programs/Pages/ukraine.aspx#directives.", "(Linked To: OPEN JOINT-STOCK COMPANY ROSNEFT OIL COMPANY)"]
         alternateNames:
           type: array
-            items:
-              type: string
+          items:
+            type: string
           description: Known aliases associated with the entity
           example: ["VERKHNECHONSKNEFTEGAZ", "OJSC VERKHNECHONSKNEFTEGAZ"]
         ids:
           type: array
-            items:
-              type: string
+          items:
+            type: string
           description: IDs on file for the entity
           example: ["Subject to Directive 4, Executive Order 13662 Directive Determination", "vcng@rosneft.ru, Email Address", "Subject to Directive 2, Executive Order 13662 Directive Determination"]
         sourceListURL:
@@ -818,6 +817,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/DPL'
+        sectoralSanctions:
+          type: array
+          items:
+            $ref: '#/components/schemas/SSI'
     Watch:
       description: Customer or Company watch
       properties:

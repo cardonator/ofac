@@ -29,26 +29,35 @@ ts=2019-02-05T00:03:31.9583844Z caller=main.go:42 startup="Starting ofac server 
 # Perform a basic search
 $ curl -s localhost:8084/search?name=...
 {
-  "SDNs": [
-    {
-      "entityID": "...",
-      "sdnName": "...",
-      "sdnType": "...",
-      "program": "...",
-      "title": "...",
-      "callSign": "...",
-      "vesselType": "...",
-      "tonnage": "...",
-      "grossRegisteredTonnage": "...",
-      "vesselFlag": "...",
-      "vesselOwner": "...",
-      "remarks": "..."
-    }
-  ],
-  "altNames": null,
-  "addresses": null,
-  "deniedPersons": null,
-  "bisEntities": null
+    "SDNs": [{
+        "entityID": "...",
+        "sdnName": "...",
+        "sdnType": "...",
+        "program": "...",
+        "title": "...",
+        "callSign": "...",
+        "vesselType": "...",
+        "tonnage": "...",
+        "grossRegisteredTonnage": "...",
+        "vesselFlag": "...",
+        "vesselOwner": "...",
+        "remarks": "..."
+    }],
+    "altNames": null,
+    "addresses": null,
+    "deniedPersons": null,
+    "bisEntities": [{
+        "name": "Danoush Trading Company",
+        "alternateNames": [""],
+        "addresses": ["No. 104, Beside Kheibar Hotel, Morshed Market St., Dubai , Dubai, AE"],
+        "startDate": "2008-09-22",
+        "licenseRequirement": "For all items subject to the EAR (See §744.11 of the EAR)",
+        "licensePolicy": "Presumption of denial",
+        "FRNotice": "73 FR 54509",
+        "sourceListURL": "http://bit.ly/1L47xrV",
+        "sourceInfoURL": "http://bit.ly/1L47xrV",
+        "match": 0.8
+    }]
 }
 ```
 

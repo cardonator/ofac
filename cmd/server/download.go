@@ -116,6 +116,7 @@ func (s *searcher) refreshData() (*downloadStats, error) {
 	alts := precomputeAlts(r.AlternateIdentities)
 	dps := precomputeDPs(r.DeniedPersons)
 	ssis := precomputeSSIs(r.SectoralSanctions)
+	els := precomputeELs(r.BISEntities)
 
 	stats := &downloadStats{
 		SDNs:              len(sdns),
@@ -123,6 +124,7 @@ func (s *searcher) refreshData() (*downloadStats, error) {
 		Addresses:         len(adds),
 		DeniedPersons:     len(dps),
 		SectoralSanctions: len(ssis),
+		BISEntities:       len(els),
 	}
 
 	// Set new records after precomputation (to minimize lock contention)
@@ -132,6 +134,7 @@ func (s *searcher) refreshData() (*downloadStats, error) {
 	s.Alts = alts
 	s.DPs = dps
 	s.SSIs = ssis
+	s.ELs = els
 	s.Unlock()
 
 	if s.logger != nil {

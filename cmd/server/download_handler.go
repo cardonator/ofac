@@ -27,7 +27,8 @@ func manualRefreshHandler(logger log.Logger, searcher *searcher, downloadRepo do
 			w.WriteHeader(http.StatusInternalServerError)
 		} else {
 			if logger != nil {
-				logger.Log("main", fmt.Sprintf("admin: finished sacntions lists refresh - Addresses=%d AltNames=%d SDNs=%d DeniedPersons=%d SecotralSanctions=%d", stats.Addresses, stats.Alts, stats.SDNs, stats.DeniedPersons, stats.SectoralSanctions))
+				logger.Log("main", fmt.Sprintf("admin: finished sacntions lists refresh - Addresses=%d AltNames=%d SDNs=%d DeniedPersons=%d SecotralSanctions=%d ELs=%d",
+					stats.Addresses, stats.Alts, stats.SDNs, stats.DeniedPersons, stats.SectoralSanctions, stats.BISEntities))
 			}
 			downloadRepo.recordStats(stats)
 

@@ -49,4 +49,7 @@ func TestDownload__manualRefreshPath(t *testing.T) {
 	if stats.SectoralSanctions == 0 {
 		t.Errorf("stats.SectoralSanctions=%d but expected non-zero", stats.SectoralSanctions)
 	}
+	if stats.BISEntities == 0 {
+		t.Errorf("stats.ELs=%d but expected non-zero", stats.BISEntities)
+	}
 }

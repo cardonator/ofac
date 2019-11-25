@@ -47,7 +47,8 @@ $ curl -s localhost:8084/search?name=...
   ],
   "altNames": null,
   "addresses": null,
-  "deniedPersons": null
+  "deniedPersons": null,
+  "bisEntities": null
 }
 ```
 
@@ -71,7 +72,7 @@ Docs: [docs.moov.io](https://docs.moov.io/ofac/) | [api docs](https://api.moov.i
 
 ### Features
 
-- Download OFAC and BIS Denied Persons List (DPL) data on startup
+- Download Sanctions Lists on startup
   - Admin endpoint to [manually refresh OFAC and DPL data](docs/runbook.md#force-data-refresh)
 - Index data for searches
 - Async searches and notifications (webhooks)
@@ -117,7 +118,9 @@ Note: This project uses Go Modules, which requires Go 1.11 or higher, but we shi
 - [Sanctions Search Page](https://sanctionssearch.ofac.treas.gov/)
 - [Subscribe for OFAC updates](https://service.govdelivery.com/accounts/USTREAS/subscriber/new)
 - [When should I call the OFAC Hotline?](https://www.treasury.gov/resource-center/faqs/Sanctions/Pages/directions.aspx)
+- [Treasury Department Specially Designated Nationals](https://www.treasury.gov/resource-center/sanctions/sdn-list/pages/default.aspx)
 - [BIS Denied Persons List with Denied US Export Privileges](https://bis.data.commerce.gov/dataset/Denied-Persons-List-with-Denied-US-Export-Privileg/xwtd-wd7a/data)
+- [BIS Entity List](https://www.bis.doc.gov/index.php/policy-guidance/lists-of-parties-of-concern/entity-list)
 
 ## License
 

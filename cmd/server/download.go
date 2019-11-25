@@ -41,6 +41,7 @@ type Download struct {
 	Addresses         int       `json:"addresses"`
 	DeniedPersons     int       `json:"deniedPersons"`
 	SectoralSanctions int       `json:"sectoralSanctions"`
+	BISEntities       int       `json:"bisEntities"`
 }
 
 type downloadStats struct {
@@ -49,6 +50,7 @@ type downloadStats struct {
 	Addresses         int `json:"addresses"`
 	DeniedPersons     int `json:"deniedPersons"`
 	SectoralSanctions int `json:"sectoralSanctions"`
+	BISEntities       int `json:"bisEntities"`
 }
 
 // periodicDataRefresh will forever block for interval's duration and then download and reparse the OFAC data.
@@ -64,8 +66,8 @@ func (s *searcher) periodicDataRefresh(interval time.Duration, downloadRepo down
 		} else {
 			downloadRepo.recordStats(stats)
 			if s.logger != nil {
-				s.logger.Log("main", fmt.Sprintf("Sanctions lists refreshed - Addresses=%d AltNames=%d SDNs=%d DPL=%d SectoralSanctions=%d",
-					stats.Addresses, stats.Alts, stats.SDNs, stats.DeniedPersons, stats.SectoralSanctions))
+				s.logger.Log("main", fmt.Sprintf("Sanctions lists refreshed - Addresses=%d AltNames=%d SDNs=%d DPL=%d SectoralSanctions=%d ELs=%d",
+					stats.Addresses, stats.Alts, stats.SDNs, stats.DeniedPersons, stats.SectoralSanctions, stats.BISEntities))
 			}
 			updates <- stats // send stats for re-search and watch notifications
 		}
@@ -184,19 +186,19 @@ func (r *sqliteDownloadRepository) recordStats(stats *downloadStats) error {
 		return errors.New("recordStats: nil downloadStats")
 	}
 
-	query := `insert into ofac_download_stats (downloaded_at, sdns, alt_names, addresses, denied_persons, sectoral_sanctions) values (?, ?, ?, ?, ?, ?);`
+	query := `insert into ofac_download_stats (downloaded_at, sdns, alt_names, addresses, denied_persons, sectoral_sanctions, bis_entities) values (?, ?, ?, ?, ?, ?, ?);`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
 		return err
 	}
 	defer stmt.Close()
 
-	_, err = stmt.Exec(time.Now(), stats.SDNs, stats.Alts, stats.Addresses, stats.DeniedPersons, stats.SectoralSanctions)
+	_, err = stmt.Exec(time.Now(), stats.SDNs, stats.Alts, stats.Addresses, stats.DeniedPersons, stats.SectoralSanctions, stats.BISEntities)
 	return err
 }
 
 func (r *sqliteDownloadRepository) latestDownloads(limit int) ([]Download, error) {
-	query := `select downloaded_at, sdns, alt_names, addresses, denied_persons, sectoral_sanctions from ofac_download_stats order by downloaded_at desc limit ?;`
+	query := `select downloaded_at, sdns, alt_names, addresses, denied_persons, sectoral_sanctions, bis_entities from ofac_download_stats order by downloaded_at desc limit ?;`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
 		return nil, err
@@ -212,7 +214,7 @@ func (r *sqliteDownloadRepository) latestDownloads(limit int) ([]Download, error
 	var downloads []Download
 	for rows.Next() {
 		var dl Download
-		if err := rows.Scan(&dl.Timestamp, &dl.SDNs, &dl.Alts, &dl.Addresses, &dl.DeniedPersons, &dl.SectoralSanctions); err == nil {
+		if err := rows.Scan(&dl.Timestamp, &dl.SDNs, &dl.Alts, &dl.Addresses, &dl.DeniedPersons, &dl.SectoralSanctions, &dl.BISEntities); err == nil {
 			downloads = append(downloads, dl)
 		}
 	}

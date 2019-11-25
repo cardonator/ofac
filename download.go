@@ -58,7 +58,7 @@ func (dl *Downloader) GetFiles() (string, error) {
 		dl.HTTP = http.DefaultClient
 	}
 
-	dir, err := ioutil.TempDir("", "ofac-and-dpl-downloader")
+	dir, err := ioutil.TempDir("", "sanctions-lists-downloader")
 	if err != nil {
 		return "", fmt.Errorf("OFAC: unable to make temp dir: %v", err)
 	}
@@ -101,7 +101,7 @@ func (dl *Downloader) GetFiles() (string, error) {
 	// count files and error if the count isn't what we expected
 	fds, err := ioutil.ReadDir(dir)
 	if err != nil || len(fds) != len(namesAndSources) {
-		return "", fmt.Errorf("OFAC: problem downloading (found=%d, expected=%d): err=%v", len(fds), len(namesAndSources), err)
+		return "", fmt.Errorf("DOWNLOADER: problem downloading (found=%d, expected=%d): err=%v", len(fds), len(namesAndSources), err)
 	}
 
 	return dir, nil

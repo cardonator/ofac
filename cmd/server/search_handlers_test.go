@@ -154,6 +154,7 @@ func TestSearch__NameAndAltName(t *testing.T) {
 		Addresses: addressSearcher.Addresses,
 		DPs:       dplSearcher.DPs,
 		SSIs:      ssiSearcher.SSIs,
+		ELs:       elSearcher.ELs,
 	}
 
 	router := mux.NewRouter()
@@ -172,6 +173,7 @@ func TestSearch__NameAndAltName(t *testing.T) {
 		Addresses         []*ofac.Address           `json:"addresses"`
 		DeniedPersons     []*ofac.DPL               `json:"deniedPersons"`
 		SectoralSanctions []*ofac.SSI               `json:"sectoralSanctions"`
+		BISEntities       []*ofac.EL                `json:"bisEntities"`
 	}
 	if err := json.NewDecoder(w.Body).Decode(&wrapper); err != nil {
 		t.Fatal(err)
@@ -191,6 +193,9 @@ func TestSearch__NameAndAltName(t *testing.T) {
 	if wrapper.SectoralSanctions[0].EntityID != "18736" {
 		t.Errorf("%#v", wrapper.SectoralSanctions[0].EntityID)
 	}
+	if wrapper.BISEntities[0].Name != "Mohammad Jan Khan Mangal" {
+		t.Errorf("%#v", wrapper.BISEntities[0].Name)
+	}
 }
 
 func TestSearch__Name(t *testing.T) {
@@ -202,6 +207,7 @@ func TestSearch__Name(t *testing.T) {
 		SDNs: sdnSearcher.SDNs,
 		DPs:  dplSearcher.DPs,
 		SSIs: ssiSearcher.SSIs,
+		ELs:  elSearcher.ELs,
 	}
 	addSearchRoutes(nil, router, combinedSearcher)
 	router.ServeHTTP(w, req)
@@ -219,6 +225,7 @@ func TestSearch__Name(t *testing.T) {
 		SDNs []*ofac.SDN `json:"SDNs"`
 		DPs  []*ofac.DPL `json:"deniedPersons"`
 		SSIs []*ofac.SSI `json:"sectoralSanctions"`
+		ELs  []*ofac.EL  `json:"bisEntities"`
 	}
 	if err := json.NewDecoder(w.Body).Decode(&wrapper); err != nil {
 		t.Fatal(err)
@@ -235,6 +242,9 @@ func TestSearch__Name(t *testing.T) {
 	if wrapper.DPs[0].Name != "AL NASER WINGS AIRLINES" {
 		t.Errorf("%#v", wrapper.DPs[0])
 	}
+	if wrapper.ELs[0].Name != "Mohammad Jan Khan Mangal" {
+		t.Errorf("%#v", wrapper.ELs[0])
+	}
 }
 
 func TestSearch__AltName(t *testing.T) {
@@ -245,6 +255,7 @@ func TestSearch__AltName(t *testing.T) {
 	addSearchRoutes(nil, router, &searcher{
 		Alts: altSearcher.Alts,
 		SSIs: ssiSearcher.SSIs,
+		ELs:  elSearcher.ELs,
 	})
 	router.ServeHTTP(w, req)
 	w.Flush()
@@ -260,6 +271,7 @@ func TestSearch__AltName(t *testing.T) {
 	var wrapper struct {
 		Alts []*ofac.AlternateIdentity `json:"altNames"`
 		SSIs []*ofac.SSI               `json:"sectoralSanctions"`
+		ELs  []*ofac.EL                `json:"bisEntities"`
 	}
 	if err := json.NewDecoder(w.Body).Decode(&wrapper); err != nil {
 		t.Fatal(err)
@@ -272,5 +284,8 @@ func TestSearch__AltName(t *testing.T) {
 	}
 	if wrapper.SSIs[0].EntityID != "18782" {
 		t.Errorf("%#v", wrapper.SSIs[0])
+	}
+	if wrapper.ELs[0].Name != "Luqman Yasin Yunus Shgragi" {
+		t.Errorf("%#v", wrapper.ELs[0])
 	}
 }

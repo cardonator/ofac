@@ -130,8 +130,8 @@ func main() {
 		os.Exit(1)
 	} else {
 		downloadRepo.recordStats(stats)
-		logger.Log("main", fmt.Sprintf("OFAC data refreshed - Addresses=%d AltNames=%d SDNs=%d DeniedPersons=%d SectoralSanctions=%d",
-			stats.Addresses, stats.Alts, stats.SDNs, stats.DeniedPersons, stats.SectoralSanctions))
+		logger.Log("main", fmt.Sprintf("OFAC data refreshed - Addresses=%d AltNames=%d SDNs=%d DeniedPersons=%d SectoralSanctions=%d ELs=%d",
+			stats.Addresses, stats.Alts, stats.SDNs, stats.DeniedPersons, stats.SectoralSanctions, stats.BISEntities))
 	}
 
 	// Setup Watch and Webhook database wrapper

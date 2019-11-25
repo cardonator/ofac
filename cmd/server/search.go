@@ -37,6 +37,7 @@ type searcher struct {
 	Alts         []*Alt
 	DPs          []*DP
 	SSIs         []*SSI
+	ELs          []*EL
 	sync.RWMutex // protects all above fields
 
 	logger log.Logger
@@ -343,6 +344,74 @@ func (s *searcher) TopSSIAlts(limit int, name string) []SSI {
 	return out
 }
 
+func (s *searcher) TopELs(limit int, name string) []EL {
+	name = precompute(name)
+
+	s.RLock()
+	defer s.RUnlock()
+
+	if len(s.ELs) == 0 {
+		return nil
+	}
+	xs := newLargest(limit)
+
+	for _, el := range s.ELs {
+		xs.add(&item{
+			value:  el,
+			weight: jaroWrinkler(el.name, name),
+		})
+	}
+
+	out := make([]EL, 0)
+	for _, thisItem := range xs.items {
+		if v := thisItem; v != nil {
+			ss, ok := v.value.(*EL)
+			if !ok {
+				continue
+			}
+			el := *ss
+			el.match = v.weight
+			out = append(out, el)
+		}
+	}
+	return out
+}
+
+func (s *searcher) TopELAlts(limit int, name string) []EL {
+	name = precompute(name)
+
+	s.RLock()
+	defer s.RUnlock()
+
+	if len(s.ELs) == 0 {
+		return nil
+	}
+	xs := newLargest(limit)
+
+	for _, el := range s.ELs {
+		for _, alt := range el.Entity.AlternateNames {
+			xs.add(&item{
+				value:  el,
+				weight: jaroWrinkler(alt, name),
+			})
+		}
+	}
+
+	out := make([]EL, 0)
+	for _, thisItem := range xs.items {
+		if v := thisItem; v != nil {
+			ss, ok := v.value.(*EL)
+			if !ok {
+				continue
+			}
+			el := *ss
+			el.match = v.weight
+			out = append(out, el)
+		}
+	}
+	return out
+}
+
 // SDN is ofac.SDN wrapped with precomputed search metadata
 type SDN struct {
 	*ofac.SDN
@@ -515,6 +584,33 @@ func precomputeSSIs(ssis []*ofac.SSI) []*SSI {
 		out[i] = &SSI{
 			SectoralSanction: ssi,
 			name:             precompute(reorderSDNName(ssi.Name, ssi.Type)),
+		}
+	}
+	return out
+}
+
+type EL struct {
+	Entity *ofac.EL
+	match  float64
+	name   string
+}
+
+func (e EL) MarshalJSON() ([]byte, error) {
+	return json.Marshal(struct {
+		*ofac.EL
+		Match float64 `json:"match"`
+	}{
+		e.Entity,
+		e.match,
+	})
+}
+
+func precomputeELs(els []*ofac.EL) []*EL {
+	out := make([]*EL, len(els))
+	for i, el := range els {
+		out[i] = &EL{
+			Entity: el,
+			name:   precompute(el.Name),
 		}
 	}
 	return out

@@ -9,6 +9,7 @@ import (
 	"math"
 	"net/http/httptest"
 	"net/url"
+	"reflect"
 	"testing"
 
 	"github.com/cardonator/ofac"
@@ -129,18 +130,32 @@ var (
 				SourceListURL:  "http://bit.ly/1QWTIfE",
 				SourceInfoURL:  "http://bit.ly/1MLgou0",
 			},
-			//{
-			//	EntityID:       "18737",
-			//	Type:           "Entity",
-			//	Programs:       []string{"UKRAINE-EO13662"},
-			//	Name:           "AL ZAWAHIRI",
-			//	Addresses:      []string{"35 Myasnitskaya Street, Moscow, 101000, RU"},
-			//	Remarks:        []string{"For more information on directives, please visit the following link: http://www.treasury.gov/resource-center/sanctions/Programs/Pages/ukraine.aspx#directives", "(Linked To: ROSTEC)"},
-			//	AlternateNames: []string{"CJS VTB SPECIALIZED DEPOSITORY"},
-			//	IDsOnRecord:    []string{"1117746521452, Registration ID", "56467052, Government Gazette Number", "7718852163, Tax ID No.", "Subject to Directive 3, Executive Order 13662 Directive Determination -", "www.roe.ru, Website"},
-			//	SourceListURL:  "http://bit.ly/1QWTIfE",
-			//	SourceInfoURL:  "http://bit.ly/1MLgou0",
-			//},
+		}),
+	}
+	elSearcher = &searcher{
+		ELs: precomputeELs([]*ofac.EL{
+			{
+				Name:               "Mohammad Jan Khan Mangal",
+				AlternateNames:     []string{""},
+				Addresses:          []string{"Kolola Pushta, Charahi Gul-e-Surkh, Kabul, AF", "Maidan Sahr, Hetefaq Market, Paktiya, AF"},
+				StartDate:          "11/13/19",
+				LicenceRequirement: "For all items subject to the EAR (See ¬ß744.11 of the EAR). ",
+				LicensePolicy:      "Presumption of denial.",
+				FRNotice:           "81 FR 57451",
+				SourceListURL:      "http://bit.ly/1L47xrV",
+				SourceInfoURL:      "http://bit.ly/1L47xrV",
+			},
+			{
+				Name:               "Luqman Yasin Yunus Shgragi",
+				AlternateNames:     []string{"Lkemanasel Yosef", "Luqman Sehreci."},
+				Addresses:          []string{"Savcili Mahalesi Turkmenler Caddesi No:2, Sahinbey, Gaziantep, TR", "Sanayi Mahalesi 60214 Nolu Caddesi No 11, SehitKamil, Gaziantep, TR"},
+				StartDate:          "8/23/16",
+				LicenceRequirement: "For all items subject to the EAR.  (See ¬ß744.11 of the EAR)",
+				LicensePolicy:      "Presumption of denial.",
+				FRNotice:           "81 FR 57451",
+				SourceListURL:      "http://bit.ly/1L47xrV",
+				SourceInfoURL:      "http://bit.ly/1L47xrV",
+			},
 		}),
 	}
 )
@@ -398,6 +413,17 @@ func TestSearcher_TopSSIAlts(t *testing.T) {
 	}
 }
 
+func TestSearcher_TopELAlts(t *testing.T) {
+	els := elSearcher.TopELAlts(1, "Lkemanasel")
+	if len(els) == 0 {
+		t.Fatal("emtpy ELs")
+	}
+	expectedAlts := []string{"Lkemanasel Yosef", "Luqman Sehreci."}
+	if els[0].Entity.Name != "Luqman Yasin Yunus Shgragi" || !reflect.DeepEqual(els[0].Entity.AlternateNames, expectedAlts) {
+		t.Errorf("%#v", els[0].Entity)
+	}
+}
+
 func TestSearch__FindSDN(t *testing.T) {
 	sdn := sdnSearcher.FindSDN("2676")
 	if sdn == nil {
@@ -436,5 +462,15 @@ func TestSearcher_TopSSIs(t *testing.T) {
 	}
 	if ssis[0].SectoralSanction.EntityID != "18782" {
 		t.Errorf("%#v", ssis[0].SectoralSanction)
+	}
+}
+
+func TestSearcher_TopELs(t *testing.T) {
+	els := elSearcher.TopELs(1, "Khan")
+	if len(els) == 0 {
+		t.Fatal("empty ELs")
+	}
+	if els[0].Entity.Name != "Mohammad Jan Khan Mangal" {
+		t.Errorf("%#v", els[0].Entity)
 	}
 }

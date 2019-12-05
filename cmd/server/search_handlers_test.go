@@ -244,7 +244,6 @@ func TestSearch__AltName(t *testing.T) {
 	router := mux.NewRouter()
 	addSearchRoutes(nil, router, &searcher{
 		Alts: altSearcher.Alts,
-		SSIs: ssiSearcher.SSIs,
 	})
 	router.ServeHTTP(w, req)
 	w.Flush()
@@ -259,18 +258,14 @@ func TestSearch__AltName(t *testing.T) {
 
 	var wrapper struct {
 		Alts []*ofac.AlternateIdentity `json:"altNames"`
-		SSIs []*ofac.SSI               `json:"sectoralSanctions"`
 	}
 	if err := json.NewDecoder(w.Body).Decode(&wrapper); err != nil {
 		t.Fatal(err)
 	}
-	if len(wrapper.Alts) != 1 || len(wrapper.SSIs) != 1 {
-		t.Fatalf("Alts=%d SSIs=%d", len(wrapper.Alts), len(wrapper.SSIs))
+	if len(wrapper.Alts) != 1 {
+		t.Fatalf("Alts=%d", len(wrapper.Alts))
 	}
 	if wrapper.Alts[0].EntityID != "4691" {
 		t.Errorf("%#v", wrapper.Alts[0])
-	}
-	if wrapper.SSIs[0].EntityID != "18782" {
-		t.Errorf("%#v", wrapper.SSIs[0])
 	}
 }

@@ -8,7 +8,8 @@
  */
 
 package openapi
-// Ssi Treasury Department Sectoral Sanctions Identifications List (SSI)
+
+// Treasury Department Sectoral Sanctions Identifications List (SSI)
 type Ssi struct {
 	// The ID assigned to an entity by the Treasury Department
 	EntityID string `json:"entityID,omitempty"`

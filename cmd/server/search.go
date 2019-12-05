@@ -275,6 +275,7 @@ func (s *searcher) TopDPs(limit int, name string) []DP {
 	return out
 }
 
+// TopSSIs searches Sectoral Sanctions records by Name and Alias
 func (s *searcher) TopSSIs(limit int, name string) []SSI {
 	name = precompute(name)
 
@@ -287,45 +288,17 @@ func (s *searcher) TopSSIs(limit int, name string) []SSI {
 	xs := newLargest(limit)
 
 	for _, ssi := range s.SSIs {
-		xs.add(&item{
+		it := &item{
 			value:  ssi,
 			weight: jaroWrinkler(ssi.name, name),
-		})
-	}
-
-	out := make([]SSI, 0)
-	for _, thisItem := range xs.items {
-		if v := thisItem; v != nil {
-			ss, ok := v.value.(*SSI)
-			if !ok {
-				continue
-			}
-			ssi := *ss
-			ssi.match = v.weight
-			out = append(out, ssi)
 		}
-	}
-	return out
-}
-
-func (s *searcher) TopSSIAlts(limit int, name string) []SSI {
-	name = precompute(name)
-
-	s.RLock()
-	defer s.RUnlock()
-
-	if len(s.SSIs) == 0 {
-		return nil
-	}
-	xs := newLargest(limit)
-
-	for _, ssi := range s.SSIs {
 		for _, alt := range ssi.SectoralSanction.AlternateNames {
-			xs.add(&item{
-				value:  ssi,
-				weight: jaroWrinkler(alt, name),
-			})
+			currWeight := jaroWrinkler(alt, name)
+			if currWeight > it.weight {
+				it.weight = currWeight
+			}
 		}
+		xs.add(it)
 	}
 
 	out := make([]SSI, 0)

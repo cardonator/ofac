@@ -10,40 +10,39 @@
 package openapi
 
 import (
-	_context "context"
-	_ioutil "io/ioutil"
-	_nethttp "net/http"
-	_neturl "net/url"
+	"context"
 	"fmt"
-	"strings"
 	"github.com/antihax/optional"
+	"io/ioutil"
+	"net/http"
+	"net/url"
+	"strings"
 )
 
 // Linger please
 var (
-	_ _context.Context
+	_ context.Context
 )
 
-// OFACApiService OFACApi service
 type OFACApiService service
 
-// AddOFACCompanyNameWatchOpts Optional parameters for the method 'AddOFACCompanyNameWatch'
-type AddOFACCompanyNameWatchOpts struct {
-    XRequestId optional.String
-}
-
 /*
-AddOFACCompanyNameWatch Add company watch by name. The match percentage will be included in the webhook's JSON payload.
- * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+OFACApiService Add company watch by name. The match percentage will be included in the webhook's JSON payload.
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param name Company name used to match and send watch notifications
  * @param watchRequest
  * @param optional nil or *AddOFACCompanyNameWatchOpts - Optional Parameters:
  * @param "XRequestId" (optional.String) -  Optional Request ID allows application developer to trace requests through the systems logs
 @return Watch
 */
-func (a *OFACApiService) AddOFACCompanyNameWatch(ctx _context.Context, name string, watchRequest WatchRequest, localVarOptionals *AddOFACCompanyNameWatchOpts) (Watch, *_nethttp.Response, error) {
+
+type AddOFACCompanyNameWatchOpts struct {
+	XRequestId optional.String
+}
+
+func (a *OFACApiService) AddOFACCompanyNameWatch(ctx context.Context, name string, watchRequest WatchRequest, localVarOptionals *AddOFACCompanyNameWatchOpts) (Watch, *http.Response, error) {
 	var (
-		localVarHTTPMethod   = _nethttp.MethodPost
+		localVarHttpMethod   = strings.ToUpper("Post")
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
@@ -55,94 +54,95 @@ func (a *OFACApiService) AddOFACCompanyNameWatch(ctx _context.Context, name stri
 	localVarPath := a.client.cfg.BasePath + "/companies/watch"
 
 	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := _neturl.Values{}
-	localVarFormParams := _neturl.Values{}
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
 
 	localVarQueryParams.Add("name", parameterToString(name, ""))
 	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{"application/json"}
+	localVarHttpContentTypes := []string{"application/json"}
 
 	// set Content-Type header
-	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
-	if localVarHTTPContentType != "" {
-		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
 	}
 
 	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{"application/json"}
+	localVarHttpHeaderAccepts := []string{"application/json"}
 
 	// set Accept header
-	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
-	if localVarHTTPHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
 	}
 	if localVarOptionals != nil && localVarOptionals.XRequestId.IsSet() {
 		localVarHeaderParams["X-Request-Id"] = parameterToString(localVarOptionals.XRequestId.Value(), "")
 	}
 	// body params
 	localVarPostBody = &watchRequest
-	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
 		return localVarReturnValue, nil, err
 	}
 
-	localVarHTTPResponse, err := a.client.callAPI(r)
-	if err != nil || localVarHTTPResponse == nil {
-		return localVarReturnValue, localVarHTTPResponse, err
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
-	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
 	if err != nil {
-		return localVarReturnValue, localVarHTTPResponse, err
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
-	if localVarHTTPResponse.StatusCode >= 300 {
+	if localVarHttpResponse.StatusCode >= 300 {
 		newErr := GenericOpenAPIError{
 			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
+			error: localVarHttpResponse.Status,
 		}
-		if localVarHTTPResponse.StatusCode == 200 {
+		if localVarHttpResponse.StatusCode == 200 {
 			var v Watch
-			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
-				return localVarReturnValue, localVarHTTPResponse, newErr
+				return localVarReturnValue, localVarHttpResponse, newErr
 			}
 			newErr.model = v
+			return localVarReturnValue, localVarHttpResponse, newErr
 		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
+		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
-	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"))
 	if err != nil {
 		newErr := GenericOpenAPIError{
 			body:  localVarBody,
 			error: err.Error(),
 		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
+		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
-	return localVarReturnValue, localVarHTTPResponse, nil
-}
-
-// AddOFACCompanyWatchOpts Optional parameters for the method 'AddOFACCompanyWatch'
-type AddOFACCompanyWatchOpts struct {
-    XRequestId optional.String
+	return localVarReturnValue, localVarHttpResponse, nil
 }
 
 /*
-AddOFACCompanyWatch Add OFAC watch on a Company
- * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+OFACApiService Add OFAC watch on a Company
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param companyId Company ID
  * @param watchRequest
  * @param optional nil or *AddOFACCompanyWatchOpts - Optional Parameters:
  * @param "XRequestId" (optional.String) -  Optional Request ID allows application developer to trace requests through the systems logs
 @return Watch
 */
-func (a *OFACApiService) AddOFACCompanyWatch(ctx _context.Context, companyId string, watchRequest WatchRequest, localVarOptionals *AddOFACCompanyWatchOpts) (Watch, *_nethttp.Response, error) {
+
+type AddOFACCompanyWatchOpts struct {
+	XRequestId optional.String
+}
+
+func (a *OFACApiService) AddOFACCompanyWatch(ctx context.Context, companyId string, watchRequest WatchRequest, localVarOptionals *AddOFACCompanyWatchOpts) (Watch, *http.Response, error) {
 	var (
-		localVarHTTPMethod   = _nethttp.MethodPost
+		localVarHttpMethod   = strings.ToUpper("Post")
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
@@ -152,97 +152,97 @@ func (a *OFACApiService) AddOFACCompanyWatch(ctx _context.Context, companyId str
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/companies/{companyId}/watch"
-	localVarPath = strings.Replace(localVarPath, "{"+"companyId"+"}", _neturl.QueryEscape(fmt.Sprintf("%v", companyId)), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"companyId"+"}", fmt.Sprintf("%v", companyId), -1)
 
 	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := _neturl.Values{}
-	localVarFormParams := _neturl.Values{}
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
 
 	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{"application/json"}
+	localVarHttpContentTypes := []string{"application/json"}
 
 	// set Content-Type header
-	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
-	if localVarHTTPContentType != "" {
-		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
 	}
 
 	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{"application/json"}
+	localVarHttpHeaderAccepts := []string{"application/json"}
 
 	// set Accept header
-	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
-	if localVarHTTPHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
 	}
 	if localVarOptionals != nil && localVarOptionals.XRequestId.IsSet() {
 		localVarHeaderParams["X-Request-Id"] = parameterToString(localVarOptionals.XRequestId.Value(), "")
 	}
 	// body params
 	localVarPostBody = &watchRequest
-	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
 		return localVarReturnValue, nil, err
 	}
 
-	localVarHTTPResponse, err := a.client.callAPI(r)
-	if err != nil || localVarHTTPResponse == nil {
-		return localVarReturnValue, localVarHTTPResponse, err
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
-	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
 	if err != nil {
-		return localVarReturnValue, localVarHTTPResponse, err
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
-	if localVarHTTPResponse.StatusCode >= 300 {
+	if localVarHttpResponse.StatusCode >= 300 {
 		newErr := GenericOpenAPIError{
 			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
+			error: localVarHttpResponse.Status,
 		}
-		if localVarHTTPResponse.StatusCode == 200 {
+		if localVarHttpResponse.StatusCode == 200 {
 			var v Watch
-			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
-				return localVarReturnValue, localVarHTTPResponse, newErr
+				return localVarReturnValue, localVarHttpResponse, newErr
 			}
 			newErr.model = v
-			return localVarReturnValue, localVarHTTPResponse, newErr
+			return localVarReturnValue, localVarHttpResponse, newErr
 		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
+		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
-	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"))
 	if err != nil {
 		newErr := GenericOpenAPIError{
 			body:  localVarBody,
 			error: err.Error(),
 		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
+		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
-	return localVarReturnValue, localVarHTTPResponse, nil
-}
-
-// AddOFACCustomerNameWatchOpts Optional parameters for the method 'AddOFACCustomerNameWatch'
-type AddOFACCustomerNameWatchOpts struct {
-    XRequestId optional.String
+	return localVarReturnValue, localVarHttpResponse, nil
 }
 
 /*
-AddOFACCustomerNameWatch Add customer watch by name. The match percentage will be included in the webhook's JSON payload.
- * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+OFACApiService Add customer watch by name. The match percentage will be included in the webhook's JSON payload.
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param name Individual name used to match and send watch notifications
  * @param watchRequest
  * @param optional nil or *AddOFACCustomerNameWatchOpts - Optional Parameters:
  * @param "XRequestId" (optional.String) -  Optional Request ID allows application developer to trace requests through the systems logs
 @return Watch
 */
-func (a *OFACApiService) AddOFACCustomerNameWatch(ctx _context.Context, name string, watchRequest WatchRequest, localVarOptionals *AddOFACCustomerNameWatchOpts) (Watch, *_nethttp.Response, error) {
+
+type AddOFACCustomerNameWatchOpts struct {
+	XRequestId optional.String
+}
+
+func (a *OFACApiService) AddOFACCustomerNameWatch(ctx context.Context, name string, watchRequest WatchRequest, localVarOptionals *AddOFACCustomerNameWatchOpts) (Watch, *http.Response, error) {
 	var (
-		localVarHTTPMethod   = _nethttp.MethodPost
+		localVarHttpMethod   = strings.ToUpper("Post")
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
@@ -254,94 +254,95 @@ func (a *OFACApiService) AddOFACCustomerNameWatch(ctx _context.Context, name str
 	localVarPath := a.client.cfg.BasePath + "/customers/watch"
 
 	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := _neturl.Values{}
-	localVarFormParams := _neturl.Values{}
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
 
 	localVarQueryParams.Add("name", parameterToString(name, ""))
 	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{"application/json"}
+	localVarHttpContentTypes := []string{"application/json"}
 
 	// set Content-Type header
-	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
-	if localVarHTTPContentType != "" {
-		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
 	}
 
 	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{"application/json"}
+	localVarHttpHeaderAccepts := []string{"application/json"}
 
 	// set Accept header
-	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
-	if localVarHTTPHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
 	}
 	if localVarOptionals != nil && localVarOptionals.XRequestId.IsSet() {
 		localVarHeaderParams["X-Request-Id"] = parameterToString(localVarOptionals.XRequestId.Value(), "")
 	}
 	// body params
 	localVarPostBody = &watchRequest
-	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
 		return localVarReturnValue, nil, err
 	}
 
-	localVarHTTPResponse, err := a.client.callAPI(r)
-	if err != nil || localVarHTTPResponse == nil {
-		return localVarReturnValue, localVarHTTPResponse, err
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
-	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
 	if err != nil {
-		return localVarReturnValue, localVarHTTPResponse, err
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
-	if localVarHTTPResponse.StatusCode >= 300 {
+	if localVarHttpResponse.StatusCode >= 300 {
 		newErr := GenericOpenAPIError{
 			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
+			error: localVarHttpResponse.Status,
 		}
-		if localVarHTTPResponse.StatusCode == 200 {
+		if localVarHttpResponse.StatusCode == 200 {
 			var v Watch
-			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
-				return localVarReturnValue, localVarHTTPResponse, newErr
+				return localVarReturnValue, localVarHttpResponse, newErr
 			}
 			newErr.model = v
+			return localVarReturnValue, localVarHttpResponse, newErr
 		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
+		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
-	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"))
 	if err != nil {
 		newErr := GenericOpenAPIError{
 			body:  localVarBody,
 			error: err.Error(),
 		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
+		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
-	return localVarReturnValue, localVarHTTPResponse, nil
-}
-
-// AddOFACCustomerWatchOpts Optional parameters for the method 'AddOFACCustomerWatch'
-type AddOFACCustomerWatchOpts struct {
-    XRequestId optional.String
+	return localVarReturnValue, localVarHttpResponse, nil
 }
 
 /*
-AddOFACCustomerWatch Add OFAC watch on a Customer
- * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+OFACApiService Add OFAC watch on a Customer
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param customerId Customer ID
  * @param watchRequest
  * @param optional nil or *AddOFACCustomerWatchOpts - Optional Parameters:
  * @param "XRequestId" (optional.String) -  Optional Request ID allows application developer to trace requests through the systems logs
 @return Watch
 */
-func (a *OFACApiService) AddOFACCustomerWatch(ctx _context.Context, customerId string, watchRequest WatchRequest, localVarOptionals *AddOFACCustomerWatchOpts) (Watch, *_nethttp.Response, error) {
+
+type AddOFACCustomerWatchOpts struct {
+	XRequestId optional.String
+}
+
+func (a *OFACApiService) AddOFACCustomerWatch(ctx context.Context, customerId string, watchRequest WatchRequest, localVarOptionals *AddOFACCustomerWatchOpts) (Watch, *http.Response, error) {
 	var (
-		localVarHTTPMethod   = _nethttp.MethodPost
+		localVarHttpMethod   = strings.ToUpper("Post")
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
@@ -351,95 +352,95 @@ func (a *OFACApiService) AddOFACCustomerWatch(ctx _context.Context, customerId s
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/customers/{customerId}/watch"
-	localVarPath = strings.Replace(localVarPath, "{"+"customerId"+"}", _neturl.QueryEscape(fmt.Sprintf("%v", customerId)), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"customerId"+"}", fmt.Sprintf("%v", customerId), -1)
 
 	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := _neturl.Values{}
-	localVarFormParams := _neturl.Values{}
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
 
 	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{"application/json"}
+	localVarHttpContentTypes := []string{"application/json"}
 
 	// set Content-Type header
-	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
-	if localVarHTTPContentType != "" {
-		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
 	}
 
 	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{"application/json"}
+	localVarHttpHeaderAccepts := []string{"application/json"}
 
 	// set Accept header
-	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
-	if localVarHTTPHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
 	}
 	if localVarOptionals != nil && localVarOptionals.XRequestId.IsSet() {
 		localVarHeaderParams["X-Request-Id"] = parameterToString(localVarOptionals.XRequestId.Value(), "")
 	}
 	// body params
 	localVarPostBody = &watchRequest
-	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
 		return localVarReturnValue, nil, err
 	}
 
-	localVarHTTPResponse, err := a.client.callAPI(r)
-	if err != nil || localVarHTTPResponse == nil {
-		return localVarReturnValue, localVarHTTPResponse, err
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
-	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
 	if err != nil {
-		return localVarReturnValue, localVarHTTPResponse, err
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
-	if localVarHTTPResponse.StatusCode >= 300 {
+	if localVarHttpResponse.StatusCode >= 300 {
 		newErr := GenericOpenAPIError{
 			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
+			error: localVarHttpResponse.Status,
 		}
-		if localVarHTTPResponse.StatusCode == 200 {
+		if localVarHttpResponse.StatusCode == 200 {
 			var v Watch
-			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
-				return localVarReturnValue, localVarHTTPResponse, newErr
+				return localVarReturnValue, localVarHttpResponse, newErr
 			}
 			newErr.model = v
-			return localVarReturnValue, localVarHTTPResponse, newErr
+			return localVarReturnValue, localVarHttpResponse, newErr
 		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
+		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
-	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"))
 	if err != nil {
 		newErr := GenericOpenAPIError{
 			body:  localVarBody,
 			error: err.Error(),
 		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
+		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
-	return localVarReturnValue, localVarHTTPResponse, nil
-}
-
-// GetLatestDownloadsOpts Optional parameters for the method 'GetLatestDownloads'
-type GetLatestDownloadsOpts struct {
-    Limit optional.Int32
+	return localVarReturnValue, localVarHttpResponse, nil
 }
 
 /*
-GetLatestDownloads Return list of recent downloads of OFAC data
- * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+OFACApiService Return list of recent downloads of OFAC data
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param optional nil or *GetLatestDownloadsOpts - Optional Parameters:
  * @param "Limit" (optional.Int32) -  Maximum results returned by a search
 @return []Download
 */
-func (a *OFACApiService) GetLatestDownloads(ctx _context.Context, localVarOptionals *GetLatestDownloadsOpts) ([]Download, *_nethttp.Response, error) {
+
+type GetLatestDownloadsOpts struct {
+	Limit optional.Int32
+}
+
+func (a *OFACApiService) GetLatestDownloads(ctx context.Context, localVarOptionals *GetLatestDownloadsOpts) ([]Download, *http.Response, error) {
 	var (
-		localVarHTTPMethod   = _nethttp.MethodGet
+		localVarHttpMethod   = strings.ToUpper("Get")
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
@@ -451,90 +452,91 @@ func (a *OFACApiService) GetLatestDownloads(ctx _context.Context, localVarOption
 	localVarPath := a.client.cfg.BasePath + "/downloads"
 
 	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := _neturl.Values{}
-	localVarFormParams := _neturl.Values{}
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
 
 	if localVarOptionals != nil && localVarOptionals.Limit.IsSet() {
 		localVarQueryParams.Add("limit", parameterToString(localVarOptionals.Limit.Value(), ""))
 	}
 	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{}
+	localVarHttpContentTypes := []string{}
 
 	// set Content-Type header
-	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
-	if localVarHTTPContentType != "" {
-		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
 	}
 
 	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{"application/json"}
+	localVarHttpHeaderAccepts := []string{"application/json"}
 
 	// set Accept header
-	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
-	if localVarHTTPHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
 	}
-	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
 		return localVarReturnValue, nil, err
 	}
 
-	localVarHTTPResponse, err := a.client.callAPI(r)
-	if err != nil || localVarHTTPResponse == nil {
-		return localVarReturnValue, localVarHTTPResponse, err
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
-	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
 	if err != nil {
-		return localVarReturnValue, localVarHTTPResponse, err
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
-	if localVarHTTPResponse.StatusCode >= 300 {
+	if localVarHttpResponse.StatusCode >= 300 {
 		newErr := GenericOpenAPIError{
 			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
+			error: localVarHttpResponse.Status,
 		}
-		if localVarHTTPResponse.StatusCode == 200 {
+		if localVarHttpResponse.StatusCode == 200 {
 			var v []Download
-			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
-				return localVarReturnValue, localVarHTTPResponse, newErr
+				return localVarReturnValue, localVarHttpResponse, newErr
 			}
 			newErr.model = v
+			return localVarReturnValue, localVarHttpResponse, newErr
 		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
+		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
-	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"))
 	if err != nil {
 		newErr := GenericOpenAPIError{
 			body:  localVarBody,
 			error: err.Error(),
 		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
+		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
-	return localVarReturnValue, localVarHTTPResponse, nil
-}
-
-// GetOFACCompanyOpts Optional parameters for the method 'GetOFACCompany'
-type GetOFACCompanyOpts struct {
-    XRequestId optional.String
+	return localVarReturnValue, localVarHttpResponse, nil
 }
 
 /*
-GetOFACCompany Get information about a company, trust or organization such as addresses, alternate names, and remarks.
- * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+OFACApiService Get information about a company, trust or organization such as addresses, alternate names, and remarks.
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param companyId Company ID
  * @param optional nil or *GetOFACCompanyOpts - Optional Parameters:
  * @param "XRequestId" (optional.String) -  Optional Request ID allows application developer to trace requests through the systems logs
 @return OfacCompany
 */
-func (a *OFACApiService) GetOFACCompany(ctx _context.Context, companyId string, localVarOptionals *GetOFACCompanyOpts) (OfacCompany, *_nethttp.Response, error) {
+
+type GetOFACCompanyOpts struct {
+	XRequestId optional.String
+}
+
+func (a *OFACApiService) GetOFACCompany(ctx context.Context, companyId string, localVarOptionals *GetOFACCompanyOpts) (OfacCompany, *http.Response, error) {
 	var (
-		localVarHTTPMethod   = _nethttp.MethodGet
+		localVarHttpMethod   = strings.ToUpper("Get")
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
@@ -544,93 +546,94 @@ func (a *OFACApiService) GetOFACCompany(ctx _context.Context, companyId string, 
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/companies/{companyId}"
-	localVarPath = strings.Replace(localVarPath, "{"+"companyId"+"}", _neturl.QueryEscape(fmt.Sprintf("%v", companyId)), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"companyId"+"}", fmt.Sprintf("%v", companyId), -1)
 
 	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := _neturl.Values{}
-	localVarFormParams := _neturl.Values{}
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
 
 	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{}
+	localVarHttpContentTypes := []string{}
 
 	// set Content-Type header
-	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
-	if localVarHTTPContentType != "" {
-		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
 	}
 
 	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{"application/json"}
+	localVarHttpHeaderAccepts := []string{"application/json"}
 
 	// set Accept header
-	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
-	if localVarHTTPHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
 	}
 	if localVarOptionals != nil && localVarOptionals.XRequestId.IsSet() {
 		localVarHeaderParams["X-Request-Id"] = parameterToString(localVarOptionals.XRequestId.Value(), "")
 	}
-	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
 		return localVarReturnValue, nil, err
 	}
 
-	localVarHTTPResponse, err := a.client.callAPI(r)
-	if err != nil || localVarHTTPResponse == nil {
-		return localVarReturnValue, localVarHTTPResponse, err
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
-	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
 	if err != nil {
-		return localVarReturnValue, localVarHTTPResponse, err
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
-	if localVarHTTPResponse.StatusCode >= 300 {
+	if localVarHttpResponse.StatusCode >= 300 {
 		newErr := GenericOpenAPIError{
 			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
+			error: localVarHttpResponse.Status,
 		}
-		if localVarHTTPResponse.StatusCode == 200 {
+		if localVarHttpResponse.StatusCode == 200 {
 			var v OfacCompany
-			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
-				return localVarReturnValue, localVarHTTPResponse, newErr
+				return localVarReturnValue, localVarHttpResponse, newErr
 			}
 			newErr.model = v
+			return localVarReturnValue, localVarHttpResponse, newErr
 		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
+		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
-	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"))
 	if err != nil {
 		newErr := GenericOpenAPIError{
 			body:  localVarBody,
 			error: err.Error(),
 		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
+		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
-	return localVarReturnValue, localVarHTTPResponse, nil
-}
-
-// GetOFACCustomerOpts Optional parameters for the method 'GetOFACCustomer'
-type GetOFACCustomerOpts struct {
-    XRequestId optional.String
+	return localVarReturnValue, localVarHttpResponse, nil
 }
 
 /*
-GetOFACCustomer Get information about a customer, addresses, alternate names, and their SDN metadata.
- * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+OFACApiService Get information about a customer, addresses, alternate names, and their SDN metadata.
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param customerId Customer ID
  * @param optional nil or *GetOFACCustomerOpts - Optional Parameters:
  * @param "XRequestId" (optional.String) -  Optional Request ID allows application developer to trace requests through the systems logs
 @return OfacCustomer
 */
-func (a *OFACApiService) GetOFACCustomer(ctx _context.Context, customerId string, localVarOptionals *GetOFACCustomerOpts) (OfacCustomer, *_nethttp.Response, error) {
+
+type GetOFACCustomerOpts struct {
+	XRequestId optional.String
+}
+
+func (a *OFACApiService) GetOFACCustomer(ctx context.Context, customerId string, localVarOptionals *GetOFACCustomerOpts) (OfacCustomer, *http.Response, error) {
 	var (
-		localVarHTTPMethod   = _nethttp.MethodGet
+		localVarHttpMethod   = strings.ToUpper("Get")
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
@@ -640,93 +643,94 @@ func (a *OFACApiService) GetOFACCustomer(ctx _context.Context, customerId string
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/customers/{customerId}"
-	localVarPath = strings.Replace(localVarPath, "{"+"customerId"+"}", _neturl.QueryEscape(fmt.Sprintf("%v", customerId)), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"customerId"+"}", fmt.Sprintf("%v", customerId), -1)
 
 	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := _neturl.Values{}
-	localVarFormParams := _neturl.Values{}
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
 
 	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{}
+	localVarHttpContentTypes := []string{}
 
 	// set Content-Type header
-	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
-	if localVarHTTPContentType != "" {
-		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
 	}
 
 	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{"application/json"}
+	localVarHttpHeaderAccepts := []string{"application/json"}
 
 	// set Accept header
-	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
-	if localVarHTTPHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
 	}
 	if localVarOptionals != nil && localVarOptionals.XRequestId.IsSet() {
 		localVarHeaderParams["X-Request-Id"] = parameterToString(localVarOptionals.XRequestId.Value(), "")
 	}
-	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
 		return localVarReturnValue, nil, err
 	}
 
-	localVarHTTPResponse, err := a.client.callAPI(r)
-	if err != nil || localVarHTTPResponse == nil {
-		return localVarReturnValue, localVarHTTPResponse, err
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
-	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
 	if err != nil {
-		return localVarReturnValue, localVarHTTPResponse, err
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
-	if localVarHTTPResponse.StatusCode >= 300 {
+	if localVarHttpResponse.StatusCode >= 300 {
 		newErr := GenericOpenAPIError{
 			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
+			error: localVarHttpResponse.Status,
 		}
-		if localVarHTTPResponse.StatusCode == 200 {
+		if localVarHttpResponse.StatusCode == 200 {
 			var v OfacCustomer
-			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
-				return localVarReturnValue, localVarHTTPResponse, newErr
+				return localVarReturnValue, localVarHttpResponse, newErr
 			}
 			newErr.model = v
+			return localVarReturnValue, localVarHttpResponse, newErr
 		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
+		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
-	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"))
 	if err != nil {
 		newErr := GenericOpenAPIError{
 			body:  localVarBody,
 			error: err.Error(),
 		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
+		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
-	return localVarReturnValue, localVarHTTPResponse, nil
-}
-
-// GetSDNOpts Optional parameters for the method 'GetSDN'
-type GetSDNOpts struct {
-    XRequestId optional.String
+	return localVarReturnValue, localVarHttpResponse, nil
 }
 
 /*
-GetSDN Specially designated national
- * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+OFACApiService Specially designated national
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param sdnId SDN ID
  * @param optional nil or *GetSDNOpts - Optional Parameters:
  * @param "XRequestId" (optional.String) -  Optional Request ID allows application developer to trace requests through the systems logs
 @return Sdn
 */
-func (a *OFACApiService) GetSDN(ctx _context.Context, sdnId string, localVarOptionals *GetSDNOpts) (Sdn, *_nethttp.Response, error) {
+
+type GetSDNOpts struct {
+	XRequestId optional.String
+}
+
+func (a *OFACApiService) GetSDN(ctx context.Context, sdnId string, localVarOptionals *GetSDNOpts) (Sdn, *http.Response, error) {
 	var (
-		localVarHTTPMethod   = _nethttp.MethodGet
+		localVarHttpMethod   = strings.ToUpper("Get")
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
@@ -736,93 +740,94 @@ func (a *OFACApiService) GetSDN(ctx _context.Context, sdnId string, localVarOpti
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/sdn/{sdnId}"
-	localVarPath = strings.Replace(localVarPath, "{"+"sdnId"+"}", _neturl.QueryEscape(fmt.Sprintf("%v", sdnId)), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"sdnId"+"}", fmt.Sprintf("%v", sdnId), -1)
 
 	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := _neturl.Values{}
-	localVarFormParams := _neturl.Values{}
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
 
 	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{}
+	localVarHttpContentTypes := []string{}
 
 	// set Content-Type header
-	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
-	if localVarHTTPContentType != "" {
-		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
 	}
 
 	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{"application/json"}
+	localVarHttpHeaderAccepts := []string{"application/json"}
 
 	// set Accept header
-	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
-	if localVarHTTPHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
 	}
 	if localVarOptionals != nil && localVarOptionals.XRequestId.IsSet() {
 		localVarHeaderParams["X-Request-Id"] = parameterToString(localVarOptionals.XRequestId.Value(), "")
 	}
-	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
 		return localVarReturnValue, nil, err
 	}
 
-	localVarHTTPResponse, err := a.client.callAPI(r)
-	if err != nil || localVarHTTPResponse == nil {
-		return localVarReturnValue, localVarHTTPResponse, err
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
-	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
 	if err != nil {
-		return localVarReturnValue, localVarHTTPResponse, err
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
-	if localVarHTTPResponse.StatusCode >= 300 {
+	if localVarHttpResponse.StatusCode >= 300 {
 		newErr := GenericOpenAPIError{
 			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
+			error: localVarHttpResponse.Status,
 		}
-		if localVarHTTPResponse.StatusCode == 200 {
+		if localVarHttpResponse.StatusCode == 200 {
 			var v Sdn
-			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
-				return localVarReturnValue, localVarHTTPResponse, newErr
+				return localVarReturnValue, localVarHttpResponse, newErr
 			}
 			newErr.model = v
+			return localVarReturnValue, localVarHttpResponse, newErr
 		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
+		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
-	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"))
 	if err != nil {
 		newErr := GenericOpenAPIError{
 			body:  localVarBody,
 			error: err.Error(),
 		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
+		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
-	return localVarReturnValue, localVarHTTPResponse, nil
-}
-
-// GetSDNAddressesOpts Optional parameters for the method 'GetSDNAddresses'
-type GetSDNAddressesOpts struct {
-    XRequestId optional.String
+	return localVarReturnValue, localVarHttpResponse, nil
 }
 
 /*
-GetSDNAddresses Get addresses for a given SDN
- * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+OFACApiService Get addresses for a given SDN
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param sdnId SDN ID
  * @param optional nil or *GetSDNAddressesOpts - Optional Parameters:
  * @param "XRequestId" (optional.String) -  Optional Request ID allows application developer to trace requests through the systems logs
 @return []Address
 */
-func (a *OFACApiService) GetSDNAddresses(ctx _context.Context, sdnId string, localVarOptionals *GetSDNAddressesOpts) ([]Address, *_nethttp.Response, error) {
+
+type GetSDNAddressesOpts struct {
+	XRequestId optional.String
+}
+
+func (a *OFACApiService) GetSDNAddresses(ctx context.Context, sdnId string, localVarOptionals *GetSDNAddressesOpts) ([]Address, *http.Response, error) {
 	var (
-		localVarHTTPMethod   = _nethttp.MethodGet
+		localVarHttpMethod   = strings.ToUpper("Get")
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
@@ -832,93 +837,94 @@ func (a *OFACApiService) GetSDNAddresses(ctx _context.Context, sdnId string, loc
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/sdn/{sdnId}/addresses"
-	localVarPath = strings.Replace(localVarPath, "{"+"sdnId"+"}", _neturl.QueryEscape(fmt.Sprintf("%v", sdnId)), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"sdnId"+"}", fmt.Sprintf("%v", sdnId), -1)
 
 	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := _neturl.Values{}
-	localVarFormParams := _neturl.Values{}
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
 
 	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{}
+	localVarHttpContentTypes := []string{}
 
 	// set Content-Type header
-	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
-	if localVarHTTPContentType != "" {
-		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
 	}
 
 	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{"application/json"}
+	localVarHttpHeaderAccepts := []string{"application/json"}
 
 	// set Accept header
-	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
-	if localVarHTTPHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
 	}
 	if localVarOptionals != nil && localVarOptionals.XRequestId.IsSet() {
 		localVarHeaderParams["X-Request-Id"] = parameterToString(localVarOptionals.XRequestId.Value(), "")
 	}
-	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
 		return localVarReturnValue, nil, err
 	}
 
-	localVarHTTPResponse, err := a.client.callAPI(r)
-	if err != nil || localVarHTTPResponse == nil {
-		return localVarReturnValue, localVarHTTPResponse, err
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
-	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
 	if err != nil {
-		return localVarReturnValue, localVarHTTPResponse, err
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
-	if localVarHTTPResponse.StatusCode >= 300 {
+	if localVarHttpResponse.StatusCode >= 300 {
 		newErr := GenericOpenAPIError{
 			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
+			error: localVarHttpResponse.Status,
 		}
-		if localVarHTTPResponse.StatusCode == 200 {
+		if localVarHttpResponse.StatusCode == 200 {
 			var v []Address
-			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
-				return localVarReturnValue, localVarHTTPResponse, newErr
+				return localVarReturnValue, localVarHttpResponse, newErr
 			}
 			newErr.model = v
+			return localVarReturnValue, localVarHttpResponse, newErr
 		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
+		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
-	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"))
 	if err != nil {
 		newErr := GenericOpenAPIError{
 			body:  localVarBody,
 			error: err.Error(),
 		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
+		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
-	return localVarReturnValue, localVarHTTPResponse, nil
-}
-
-// GetSDNAltNamesOpts Optional parameters for the method 'GetSDNAltNames'
-type GetSDNAltNamesOpts struct {
-    XRequestId optional.String
+	return localVarReturnValue, localVarHttpResponse, nil
 }
 
 /*
-GetSDNAltNames Get alternate names for a given SDN
- * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+OFACApiService Get alternate names for a given SDN
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param sdnId SDN ID
  * @param optional nil or *GetSDNAltNamesOpts - Optional Parameters:
  * @param "XRequestId" (optional.String) -  Optional Request ID allows application developer to trace requests through the systems logs
 @return []Alt
 */
-func (a *OFACApiService) GetSDNAltNames(ctx _context.Context, sdnId string, localVarOptionals *GetSDNAltNamesOpts) ([]Alt, *_nethttp.Response, error) {
+
+type GetSDNAltNamesOpts struct {
+	XRequestId optional.String
+}
+
+func (a *OFACApiService) GetSDNAltNames(ctx context.Context, sdnId string, localVarOptionals *GetSDNAltNamesOpts) ([]Alt, *http.Response, error) {
 	var (
-		localVarHTTPMethod   = _nethttp.MethodGet
+		localVarHttpMethod   = strings.ToUpper("Get")
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
@@ -928,84 +934,85 @@ func (a *OFACApiService) GetSDNAltNames(ctx _context.Context, sdnId string, loca
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/sdn/{sdnId}/alts"
-	localVarPath = strings.Replace(localVarPath, "{"+"sdnId"+"}", _neturl.QueryEscape(fmt.Sprintf("%v", sdnId)), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"sdnId"+"}", fmt.Sprintf("%v", sdnId), -1)
 
 	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := _neturl.Values{}
-	localVarFormParams := _neturl.Values{}
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
 
 	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{}
+	localVarHttpContentTypes := []string{}
 
 	// set Content-Type header
-	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
-	if localVarHTTPContentType != "" {
-		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
 	}
 
 	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{"application/json"}
+	localVarHttpHeaderAccepts := []string{"application/json"}
 
 	// set Accept header
-	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
-	if localVarHTTPHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
 	}
 	if localVarOptionals != nil && localVarOptionals.XRequestId.IsSet() {
 		localVarHeaderParams["X-Request-Id"] = parameterToString(localVarOptionals.XRequestId.Value(), "")
 	}
-	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
 		return localVarReturnValue, nil, err
 	}
 
-	localVarHTTPResponse, err := a.client.callAPI(r)
-	if err != nil || localVarHTTPResponse == nil {
-		return localVarReturnValue, localVarHTTPResponse, err
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
-	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
 	if err != nil {
-		return localVarReturnValue, localVarHTTPResponse, err
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
-	if localVarHTTPResponse.StatusCode >= 300 {
+	if localVarHttpResponse.StatusCode >= 300 {
 		newErr := GenericOpenAPIError{
 			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
+			error: localVarHttpResponse.Status,
 		}
-		if localVarHTTPResponse.StatusCode == 200 {
+		if localVarHttpResponse.StatusCode == 200 {
 			var v []Alt
-			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
-				return localVarReturnValue, localVarHTTPResponse, newErr
+				return localVarReturnValue, localVarHttpResponse, newErr
 			}
 			newErr.model = v
+			return localVarReturnValue, localVarHttpResponse, newErr
 		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
+		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
-	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"))
 	if err != nil {
 		newErr := GenericOpenAPIError{
 			body:  localVarBody,
 			error: err.Error(),
 		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
+		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
-	return localVarReturnValue, localVarHTTPResponse, nil
+	return localVarReturnValue, localVarHttpResponse, nil
 }
 
 /*
-Ping Ping the OFAC service to check if running
- * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+OFACApiService Ping the OFAC service to check if running
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
 */
-func (a *OFACApiService) Ping(ctx _context.Context) (*_nethttp.Response, error) {
+func (a *OFACApiService) Ping(ctx context.Context) (*http.Response, error) {
 	var (
-		localVarHTTPMethod   = _nethttp.MethodGet
+		localVarHttpMethod   = strings.ToUpper("Get")
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
@@ -1016,69 +1023,69 @@ func (a *OFACApiService) Ping(ctx _context.Context) (*_nethttp.Response, error) 
 	localVarPath := a.client.cfg.BasePath + "/ping"
 
 	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := _neturl.Values{}
-	localVarFormParams := _neturl.Values{}
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
 
 	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{}
+	localVarHttpContentTypes := []string{}
 
 	// set Content-Type header
-	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
-	if localVarHTTPContentType != "" {
-		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
 	}
 
 	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{}
+	localVarHttpHeaderAccepts := []string{}
 
 	// set Accept header
-	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
-	if localVarHTTPHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
 	}
-	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
 		return nil, err
 	}
 
-	localVarHTTPResponse, err := a.client.callAPI(r)
-	if err != nil || localVarHTTPResponse == nil {
-		return localVarHTTPResponse, err
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarHttpResponse, err
 	}
 
-	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
 	if err != nil {
-		return localVarHTTPResponse, err
+		return localVarHttpResponse, err
 	}
 
-	if localVarHTTPResponse.StatusCode >= 300 {
+	if localVarHttpResponse.StatusCode >= 300 {
 		newErr := GenericOpenAPIError{
 			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
+			error: localVarHttpResponse.Status,
 		}
-		return localVarHTTPResponse, newErr
+		return localVarHttpResponse, newErr
 	}
 
-	return localVarHTTPResponse, nil
-}
-
-// RemoveOFACCompanyNameWatchOpts Optional parameters for the method 'RemoveOFACCompanyNameWatch'
-type RemoveOFACCompanyNameWatchOpts struct {
-    XRequestId optional.String
+	return localVarHttpResponse, nil
 }
 
 /*
-RemoveOFACCompanyNameWatch Remove a Company name watch
- * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+OFACApiService Remove a Company name watch
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param watchId Watch ID, used to identify a specific watch
  * @param name Company name watch
  * @param optional nil or *RemoveOFACCompanyNameWatchOpts - Optional Parameters:
  * @param "XRequestId" (optional.String) -  Optional Request ID allows application developer to trace requests through the systems logs
 */
-func (a *OFACApiService) RemoveOFACCompanyNameWatch(ctx _context.Context, watchId string, name string, localVarOptionals *RemoveOFACCompanyNameWatchOpts) (*_nethttp.Response, error) {
+
+type RemoveOFACCompanyNameWatchOpts struct {
+	XRequestId optional.String
+}
+
+func (a *OFACApiService) RemoveOFACCompanyNameWatch(ctx context.Context, watchId string, name string, localVarOptionals *RemoveOFACCompanyNameWatchOpts) (*http.Response, error) {
 	var (
-		localVarHTTPMethod   = _nethttp.MethodDelete
+		localVarHttpMethod   = strings.ToUpper("Delete")
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
@@ -1087,76 +1094,76 @@ func (a *OFACApiService) RemoveOFACCompanyNameWatch(ctx _context.Context, watchI
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/companies/watch/{watchId}"
-	localVarPath = strings.Replace(localVarPath, "{"+"watchId"+"}", _neturl.QueryEscape(fmt.Sprintf("%v", watchId)), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"watchId"+"}", fmt.Sprintf("%v", watchId), -1)
 
 	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := _neturl.Values{}
-	localVarFormParams := _neturl.Values{}
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
 
 	localVarQueryParams.Add("name", parameterToString(name, ""))
 	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{}
+	localVarHttpContentTypes := []string{}
 
 	// set Content-Type header
-	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
-	if localVarHTTPContentType != "" {
-		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
 	}
 
 	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{}
+	localVarHttpHeaderAccepts := []string{}
 
 	// set Accept header
-	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
-	if localVarHTTPHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
 	}
 	if localVarOptionals != nil && localVarOptionals.XRequestId.IsSet() {
 		localVarHeaderParams["X-Request-Id"] = parameterToString(localVarOptionals.XRequestId.Value(), "")
 	}
-	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
 		return nil, err
 	}
 
-	localVarHTTPResponse, err := a.client.callAPI(r)
-	if err != nil || localVarHTTPResponse == nil {
-		return localVarHTTPResponse, err
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarHttpResponse, err
 	}
 
-	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
 	if err != nil {
-		return localVarHTTPResponse, err
+		return localVarHttpResponse, err
 	}
 
-	if localVarHTTPResponse.StatusCode >= 300 {
+	if localVarHttpResponse.StatusCode >= 300 {
 		newErr := GenericOpenAPIError{
 			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
+			error: localVarHttpResponse.Status,
 		}
-		return localVarHTTPResponse, newErr
+		return localVarHttpResponse, newErr
 	}
 
-	return localVarHTTPResponse, nil
-}
-
-// RemoveOFACCompanyWatchOpts Optional parameters for the method 'RemoveOFACCompanyWatch'
-type RemoveOFACCompanyWatchOpts struct {
-    XRequestId optional.String
+	return localVarHttpResponse, nil
 }
 
 /*
-RemoveOFACCompanyWatch Remove company watch
- * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+OFACApiService Remove company watch
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param companyId Company ID
  * @param watchId Watch ID, used to identify a specific watch
  * @param optional nil or *RemoveOFACCompanyWatchOpts - Optional Parameters:
  * @param "XRequestId" (optional.String) -  Optional Request ID allows application developer to trace requests through the systems logs
 */
-func (a *OFACApiService) RemoveOFACCompanyWatch(ctx _context.Context, companyId string, watchId string, localVarOptionals *RemoveOFACCompanyWatchOpts) (*_nethttp.Response, error) {
+
+type RemoveOFACCompanyWatchOpts struct {
+	XRequestId optional.String
+}
+
+func (a *OFACApiService) RemoveOFACCompanyWatch(ctx context.Context, companyId string, watchId string, localVarOptionals *RemoveOFACCompanyWatchOpts) (*http.Response, error) {
 	var (
-		localVarHTTPMethod   = _nethttp.MethodDelete
+		localVarHttpMethod   = strings.ToUpper("Delete")
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
@@ -1165,76 +1172,76 @@ func (a *OFACApiService) RemoveOFACCompanyWatch(ctx _context.Context, companyId 
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/companies/{companyId}/watch/{watchId}"
-	localVarPath = strings.Replace(localVarPath, "{"+"companyId"+"}", _neturl.QueryEscape(fmt.Sprintf("%v", companyId)), -1)
-	localVarPath = strings.Replace(localVarPath, "{"+"watchId"+"}", _neturl.QueryEscape(fmt.Sprintf("%v", watchId)), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"companyId"+"}", fmt.Sprintf("%v", companyId), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"watchId"+"}", fmt.Sprintf("%v", watchId), -1)
 
 	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := _neturl.Values{}
-	localVarFormParams := _neturl.Values{}
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
 
 	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{}
+	localVarHttpContentTypes := []string{}
 
 	// set Content-Type header
-	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
-	if localVarHTTPContentType != "" {
-		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
 	}
 
 	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{}
+	localVarHttpHeaderAccepts := []string{}
 
 	// set Accept header
-	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
-	if localVarHTTPHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
 	}
 	if localVarOptionals != nil && localVarOptionals.XRequestId.IsSet() {
 		localVarHeaderParams["X-Request-Id"] = parameterToString(localVarOptionals.XRequestId.Value(), "")
 	}
-	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
 		return nil, err
 	}
 
-	localVarHTTPResponse, err := a.client.callAPI(r)
-	if err != nil || localVarHTTPResponse == nil {
-		return localVarHTTPResponse, err
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarHttpResponse, err
 	}
 
-	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
 	if err != nil {
-		return localVarHTTPResponse, err
+		return localVarHttpResponse, err
 	}
 
-	if localVarHTTPResponse.StatusCode >= 300 {
+	if localVarHttpResponse.StatusCode >= 300 {
 		newErr := GenericOpenAPIError{
 			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
+			error: localVarHttpResponse.Status,
 		}
-		return localVarHTTPResponse, newErr
+		return localVarHttpResponse, newErr
 	}
 
-	return localVarHTTPResponse, nil
-}
-
-// RemoveOFACCustomerNameWatchOpts Optional parameters for the method 'RemoveOFACCustomerNameWatch'
-type RemoveOFACCustomerNameWatchOpts struct {
-    XRequestId optional.String
+	return localVarHttpResponse, nil
 }
 
 /*
-RemoveOFACCustomerNameWatch Remove a Customer name watch
- * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+OFACApiService Remove a Customer name watch
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param watchId Watch ID, used to identify a specific watch
  * @param name Customer or Company name watch
  * @param optional nil or *RemoveOFACCustomerNameWatchOpts - Optional Parameters:
  * @param "XRequestId" (optional.String) -  Optional Request ID allows application developer to trace requests through the systems logs
 */
-func (a *OFACApiService) RemoveOFACCustomerNameWatch(ctx _context.Context, watchId string, name string, localVarOptionals *RemoveOFACCustomerNameWatchOpts) (*_nethttp.Response, error) {
+
+type RemoveOFACCustomerNameWatchOpts struct {
+	XRequestId optional.String
+}
+
+func (a *OFACApiService) RemoveOFACCustomerNameWatch(ctx context.Context, watchId string, name string, localVarOptionals *RemoveOFACCustomerNameWatchOpts) (*http.Response, error) {
 	var (
-		localVarHTTPMethod   = _nethttp.MethodDelete
+		localVarHttpMethod   = strings.ToUpper("Delete")
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
@@ -1243,76 +1250,76 @@ func (a *OFACApiService) RemoveOFACCustomerNameWatch(ctx _context.Context, watch
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/customers/watch/{watchId}"
-	localVarPath = strings.Replace(localVarPath, "{"+"watchId"+"}", _neturl.QueryEscape(fmt.Sprintf("%v", watchId)), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"watchId"+"}", fmt.Sprintf("%v", watchId), -1)
 
 	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := _neturl.Values{}
-	localVarFormParams := _neturl.Values{}
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
 
 	localVarQueryParams.Add("name", parameterToString(name, ""))
 	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{}
+	localVarHttpContentTypes := []string{}
 
 	// set Content-Type header
-	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
-	if localVarHTTPContentType != "" {
-		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
 	}
 
 	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{}
+	localVarHttpHeaderAccepts := []string{}
 
 	// set Accept header
-	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
-	if localVarHTTPHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
 	}
 	if localVarOptionals != nil && localVarOptionals.XRequestId.IsSet() {
 		localVarHeaderParams["X-Request-Id"] = parameterToString(localVarOptionals.XRequestId.Value(), "")
 	}
-	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
 		return nil, err
 	}
 
-	localVarHTTPResponse, err := a.client.callAPI(r)
-	if err != nil || localVarHTTPResponse == nil {
-		return localVarHTTPResponse, err
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarHttpResponse, err
 	}
 
-	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
 	if err != nil {
-		return localVarHTTPResponse, err
+		return localVarHttpResponse, err
 	}
 
-	if localVarHTTPResponse.StatusCode >= 300 {
+	if localVarHttpResponse.StatusCode >= 300 {
 		newErr := GenericOpenAPIError{
 			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
+			error: localVarHttpResponse.Status,
 		}
-		return localVarHTTPResponse, newErr
+		return localVarHttpResponse, newErr
 	}
 
-	return localVarHTTPResponse, nil
-}
-
-// RemoveOFACCustomerWatchOpts Optional parameters for the method 'RemoveOFACCustomerWatch'
-type RemoveOFACCustomerWatchOpts struct {
-    XRequestId optional.String
+	return localVarHttpResponse, nil
 }
 
 /*
-RemoveOFACCustomerWatch Remove customer watch
- * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+OFACApiService Remove customer watch
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param customerId Customer ID
  * @param watchId Watch ID, used to identify a specific watch
  * @param optional nil or *RemoveOFACCustomerWatchOpts - Optional Parameters:
  * @param "XRequestId" (optional.String) -  Optional Request ID allows application developer to trace requests through the systems logs
 */
-func (a *OFACApiService) RemoveOFACCustomerWatch(ctx _context.Context, customerId string, watchId string, localVarOptionals *RemoveOFACCustomerWatchOpts) (*_nethttp.Response, error) {
+
+type RemoveOFACCustomerWatchOpts struct {
+	XRequestId optional.String
+}
+
+func (a *OFACApiService) RemoveOFACCustomerWatch(ctx context.Context, customerId string, watchId string, localVarOptionals *RemoveOFACCustomerWatchOpts) (*http.Response, error) {
 	var (
-		localVarHTTPMethod   = _nethttp.MethodDelete
+		localVarHttpMethod   = strings.ToUpper("Delete")
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
@@ -1321,78 +1328,63 @@ func (a *OFACApiService) RemoveOFACCustomerWatch(ctx _context.Context, customerI
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/customers/{customerId}/watch/{watchId}"
-	localVarPath = strings.Replace(localVarPath, "{"+"customerId"+"}", _neturl.QueryEscape(fmt.Sprintf("%v", customerId)), -1)
-	localVarPath = strings.Replace(localVarPath, "{"+"watchId"+"}", _neturl.QueryEscape(fmt.Sprintf("%v", watchId)), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"customerId"+"}", fmt.Sprintf("%v", customerId), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"watchId"+"}", fmt.Sprintf("%v", watchId), -1)
 
 	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := _neturl.Values{}
-	localVarFormParams := _neturl.Values{}
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
 
 	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{}
+	localVarHttpContentTypes := []string{}
 
 	// set Content-Type header
-	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
-	if localVarHTTPContentType != "" {
-		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
 	}
 
 	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{}
+	localVarHttpHeaderAccepts := []string{}
 
 	// set Accept header
-	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
-	if localVarHTTPHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
 	}
 	if localVarOptionals != nil && localVarOptionals.XRequestId.IsSet() {
 		localVarHeaderParams["X-Request-Id"] = parameterToString(localVarOptionals.XRequestId.Value(), "")
 	}
-	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
 		return nil, err
 	}
 
-	localVarHTTPResponse, err := a.client.callAPI(r)
-	if err != nil || localVarHTTPResponse == nil {
-		return localVarHTTPResponse, err
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarHttpResponse, err
 	}
 
-	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
 	if err != nil {
-		return localVarHTTPResponse, err
+		return localVarHttpResponse, err
 	}
 
-	if localVarHTTPResponse.StatusCode >= 300 {
+	if localVarHttpResponse.StatusCode >= 300 {
 		newErr := GenericOpenAPIError{
 			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
+			error: localVarHttpResponse.Status,
 		}
-		return localVarHTTPResponse, newErr
+		return localVarHttpResponse, newErr
 	}
 
-	return localVarHTTPResponse, nil
-}
-
-// SearchOpts Optional parameters for the method 'Search'
-type SearchOpts struct {
-    XRequestId optional.String
-    Q optional.String
-    Name optional.String
-    Address optional.String
-    City optional.String
-    State optional.String
-    Providence optional.String
-    Zip optional.String
-    Country optional.String
-    AltName optional.String
-    Limit optional.Int32
+	return localVarHttpResponse, nil
 }
 
 /*
-Search Search SDN names and metadata
- * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+OFACApiService Search SDN names and metadata
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param optional nil or *SearchOpts - Optional Parameters:
  * @param "XRequestId" (optional.String) -  Optional Request ID allows application developer to trace requests through the systems logs
  * @param "Q" (optional.String) -  Search across Name, Alt Names, and Address fields for all SDN entries. Entries may be returned in all response sub-objects.
@@ -1407,9 +1399,24 @@ Search Search SDN names and metadata
  * @param "Limit" (optional.Int32) -  Maximum results returned by a search
 @return Search
 */
-func (a *OFACApiService) Search(ctx _context.Context, localVarOptionals *SearchOpts) (Search, *_nethttp.Response, error) {
+
+type SearchOpts struct {
+	XRequestId optional.String
+	Q          optional.String
+	Name       optional.String
+	Address    optional.String
+	City       optional.String
+	State      optional.String
+	Providence optional.String
+	Zip        optional.String
+	Country    optional.String
+	AltName    optional.String
+	Limit      optional.Int32
+}
+
+func (a *OFACApiService) Search(ctx context.Context, localVarOptionals *SearchOpts) (Search, *http.Response, error) {
 	var (
-		localVarHTTPMethod   = _nethttp.MethodGet
+		localVarHttpMethod   = strings.ToUpper("Get")
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
@@ -1421,8 +1428,8 @@ func (a *OFACApiService) Search(ctx _context.Context, localVarOptionals *SearchO
 	localVarPath := a.client.cfg.BasePath + "/search"
 
 	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := _neturl.Values{}
-	localVarFormParams := _neturl.Values{}
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
 
 	if localVarOptionals != nil && localVarOptionals.Q.IsSet() {
 		localVarQueryParams.Add("q", parameterToString(localVarOptionals.Q.Value(), ""))
@@ -1455,86 +1462,87 @@ func (a *OFACApiService) Search(ctx _context.Context, localVarOptionals *SearchO
 		localVarQueryParams.Add("limit", parameterToString(localVarOptionals.Limit.Value(), ""))
 	}
 	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{}
+	localVarHttpContentTypes := []string{}
 
 	// set Content-Type header
-	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
-	if localVarHTTPContentType != "" {
-		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
 	}
 
 	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{"application/json"}
+	localVarHttpHeaderAccepts := []string{"application/json"}
 
 	// set Accept header
-	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
-	if localVarHTTPHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
 	}
 	if localVarOptionals != nil && localVarOptionals.XRequestId.IsSet() {
 		localVarHeaderParams["X-Request-Id"] = parameterToString(localVarOptionals.XRequestId.Value(), "")
 	}
-	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
 		return localVarReturnValue, nil, err
 	}
 
-	localVarHTTPResponse, err := a.client.callAPI(r)
-	if err != nil || localVarHTTPResponse == nil {
-		return localVarReturnValue, localVarHTTPResponse, err
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
-	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
 	if err != nil {
-		return localVarReturnValue, localVarHTTPResponse, err
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
-	if localVarHTTPResponse.StatusCode >= 300 {
+	if localVarHttpResponse.StatusCode >= 300 {
 		newErr := GenericOpenAPIError{
 			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
+			error: localVarHttpResponse.Status,
 		}
-		if localVarHTTPResponse.StatusCode == 200 {
+		if localVarHttpResponse.StatusCode == 200 {
 			var v Search
-			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
-				return localVarReturnValue, localVarHTTPResponse, newErr
+				return localVarReturnValue, localVarHttpResponse, newErr
 			}
 			newErr.model = v
+			return localVarReturnValue, localVarHttpResponse, newErr
 		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
+		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
-	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"))
 	if err != nil {
 		newErr := GenericOpenAPIError{
 			body:  localVarBody,
 			error: err.Error(),
 		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
+		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
-	return localVarReturnValue, localVarHTTPResponse, nil
-}
-
-// UpdateOFACCompanyStatusOpts Optional parameters for the method 'UpdateOFACCompanyStatus'
-type UpdateOFACCompanyStatusOpts struct {
-    XRequestId optional.String
+	return localVarReturnValue, localVarHttpResponse, nil
 }
 
 /*
-UpdateOFACCompanyStatus Update a Companies sanction status to always block or always allow transactions.
- * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+OFACApiService Update a Companies sanction status to always block or always allow transactions.
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param companyId Company ID
  * @param updateCompanyStatus
  * @param optional nil or *UpdateOFACCompanyStatusOpts - Optional Parameters:
  * @param "XRequestId" (optional.String) -  Optional Request ID allows application developer to trace requests through the systems logs
 */
-func (a *OFACApiService) UpdateOFACCompanyStatus(ctx _context.Context, companyId string, updateCompanyStatus UpdateCompanyStatus, localVarOptionals *UpdateOFACCompanyStatusOpts) (*_nethttp.Response, error) {
+
+type UpdateOFACCompanyStatusOpts struct {
+	XRequestId optional.String
+}
+
+func (a *OFACApiService) UpdateOFACCompanyStatus(ctx context.Context, companyId string, updateCompanyStatus UpdateCompanyStatus, localVarOptionals *UpdateOFACCompanyStatusOpts) (*http.Response, error) {
 	var (
-		localVarHTTPMethod   = _nethttp.MethodPut
+		localVarHttpMethod   = strings.ToUpper("Put")
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
@@ -1543,77 +1551,77 @@ func (a *OFACApiService) UpdateOFACCompanyStatus(ctx _context.Context, companyId
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/companies/{companyId}"
-	localVarPath = strings.Replace(localVarPath, "{"+"companyId"+"}", _neturl.QueryEscape(fmt.Sprintf("%v", companyId)), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"companyId"+"}", fmt.Sprintf("%v", companyId), -1)
 
 	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := _neturl.Values{}
-	localVarFormParams := _neturl.Values{}
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
 
 	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{"application/json"}
+	localVarHttpContentTypes := []string{"application/json"}
 
 	// set Content-Type header
-	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
-	if localVarHTTPContentType != "" {
-		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
 	}
 
 	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{}
+	localVarHttpHeaderAccepts := []string{}
 
 	// set Accept header
-	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
-	if localVarHTTPHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
 	}
 	if localVarOptionals != nil && localVarOptionals.XRequestId.IsSet() {
 		localVarHeaderParams["X-Request-Id"] = parameterToString(localVarOptionals.XRequestId.Value(), "")
 	}
 	// body params
 	localVarPostBody = &updateCompanyStatus
-	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
 		return nil, err
 	}
 
-	localVarHTTPResponse, err := a.client.callAPI(r)
-	if err != nil || localVarHTTPResponse == nil {
-		return localVarHTTPResponse, err
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarHttpResponse, err
 	}
 
-	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
 	if err != nil {
-		return localVarHTTPResponse, err
+		return localVarHttpResponse, err
 	}
 
-	if localVarHTTPResponse.StatusCode >= 300 {
+	if localVarHttpResponse.StatusCode >= 300 {
 		newErr := GenericOpenAPIError{
 			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
+			error: localVarHttpResponse.Status,
 		}
-		return localVarHTTPResponse, newErr
+		return localVarHttpResponse, newErr
 	}
 
-	return localVarHTTPResponse, nil
-}
-
-// UpdateOFACCustomerStatusOpts Optional parameters for the method 'UpdateOFACCustomerStatus'
-type UpdateOFACCustomerStatusOpts struct {
-    XRequestId optional.String
+	return localVarHttpResponse, nil
 }
 
 /*
-UpdateOFACCustomerStatus Update a Customer's sanction status to always block or always allow transactions.
- * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+OFACApiService Update a Customer's sanction status to always block or always allow transactions.
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param customerId Customer ID
  * @param updateCustomerStatus
  * @param optional nil or *UpdateOFACCustomerStatusOpts - Optional Parameters:
  * @param "XRequestId" (optional.String) -  Optional Request ID allows application developer to trace requests through the systems logs
 */
-func (a *OFACApiService) UpdateOFACCustomerStatus(ctx _context.Context, customerId string, updateCustomerStatus UpdateCustomerStatus, localVarOptionals *UpdateOFACCustomerStatusOpts) (*_nethttp.Response, error) {
+
+type UpdateOFACCustomerStatusOpts struct {
+	XRequestId optional.String
+}
+
+func (a *OFACApiService) UpdateOFACCustomerStatus(ctx context.Context, customerId string, updateCustomerStatus UpdateCustomerStatus, localVarOptionals *UpdateOFACCustomerStatusOpts) (*http.Response, error) {
 	var (
-		localVarHTTPMethod   = _nethttp.MethodPut
+		localVarHttpMethod   = strings.ToUpper("Put")
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
@@ -1622,57 +1630,57 @@ func (a *OFACApiService) UpdateOFACCustomerStatus(ctx _context.Context, customer
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/customers/{customerId}"
-	localVarPath = strings.Replace(localVarPath, "{"+"customerId"+"}", _neturl.QueryEscape(fmt.Sprintf("%v", customerId)), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"customerId"+"}", fmt.Sprintf("%v", customerId), -1)
 
 	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := _neturl.Values{}
-	localVarFormParams := _neturl.Values{}
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
 
 	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{"application/json"}
+	localVarHttpContentTypes := []string{"application/json"}
 
 	// set Content-Type header
-	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
-	if localVarHTTPContentType != "" {
-		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
 	}
 
 	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{}
+	localVarHttpHeaderAccepts := []string{}
 
 	// set Accept header
-	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
-	if localVarHTTPHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
 	}
 	if localVarOptionals != nil && localVarOptionals.XRequestId.IsSet() {
 		localVarHeaderParams["X-Request-Id"] = parameterToString(localVarOptionals.XRequestId.Value(), "")
 	}
 	// body params
 	localVarPostBody = &updateCustomerStatus
-	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
 		return nil, err
 	}
 
-	localVarHTTPResponse, err := a.client.callAPI(r)
-	if err != nil || localVarHTTPResponse == nil {
-		return localVarHTTPResponse, err
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarHttpResponse, err
 	}
 
-	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
 	if err != nil {
-		return localVarHTTPResponse, err
+		return localVarHttpResponse, err
 	}
 
-	if localVarHTTPResponse.StatusCode >= 300 {
+	if localVarHttpResponse.StatusCode >= 300 {
 		newErr := GenericOpenAPIError{
 			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
+			error: localVarHttpResponse.Status,
 		}
-		return localVarHTTPResponse, newErr
+		return localVarHttpResponse, newErr
 	}
 
-	return localVarHTTPResponse, nil
+	return localVarHttpResponse, nil
 }

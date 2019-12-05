@@ -1,12 +1,12 @@
-FROM golang:1.12-stretch as builder
+FROM golang:1.13-buster as builder
 WORKDIR /go/src/github.com/cardonator/ofac
 RUN apt-get update && apt-get install make gcc g++
 COPY . .
 ENV GO111MODULE=on
-run go mod download
+RUN go mod download
 RUN make build-server
 
-FROM debian:9
+FROM debian:10
 RUN apt-get update && apt-get install -y ca-certificates
 
 COPY --from=builder /go/src/github.com/cardonator/ofac/bin/server /bin/server

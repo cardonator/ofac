@@ -276,6 +276,7 @@ func (s *searcher) TopDPs(limit int, name string) []DP {
 	return out
 }
 
+// TopSSIs searches Sectoral Sanctions records by Name and Alias
 func (s *searcher) TopSSIs(limit int, name string) []SSI {
 	name = precompute(name)
 
@@ -288,45 +289,20 @@ func (s *searcher) TopSSIs(limit int, name string) []SSI {
 	xs := newLargest(limit)
 
 	for _, ssi := range s.SSIs {
-		xs.add(&item{
+		it := &item{
 			value:  ssi,
 			weight: jaroWrinkler(ssi.name, name),
-		})
-	}
-
-	out := make([]SSI, 0)
-	for _, thisItem := range xs.items {
-		if v := thisItem; v != nil {
-			ss, ok := v.value.(*SSI)
-			if !ok {
+		}
+		for _, alt := range ssi.SectoralSanction.AlternateNames {
+			if alt == "" {
 				continue
 			}
-			ssi := *ss
-			ssi.match = v.weight
-			out = append(out, ssi)
+			currWeight := jaroWrinkler(alt, name)
+			if currWeight > it.weight {
+				it.weight = currWeight
+			}
 		}
-	}
-	return out
-}
-
-func (s *searcher) TopSSIAlts(limit int, name string) []SSI {
-	name = precompute(name)
-
-	s.RLock()
-	defer s.RUnlock()
-
-	if len(s.SSIs) == 0 {
-		return nil
-	}
-	xs := newLargest(limit)
-
-	for _, ssi := range s.SSIs {
-		for _, alt := range ssi.SectoralSanction.AlternateNames {
-			xs.add(&item{
-				value:  ssi,
-				weight: jaroWrinkler(alt, name),
-			})
-		}
+		xs.add(it)
 	}
 
 	out := make([]SSI, 0)
@@ -356,45 +332,20 @@ func (s *searcher) TopELs(limit int, name string) []EL {
 	xs := newLargest(limit)
 
 	for _, el := range s.ELs {
-		xs.add(&item{
+		it := &item{
 			value:  el,
 			weight: jaroWrinkler(el.name, name),
-		})
-	}
-
-	out := make([]EL, 0)
-	for _, thisItem := range xs.items {
-		if v := thisItem; v != nil {
-			ss, ok := v.value.(*EL)
-			if !ok {
+		}
+		for _, alt := range el.Entity.AlternateNames {
+			if alt == "" {
 				continue
 			}
-			el := *ss
-			el.match = v.weight
-			out = append(out, el)
+			currWeight := jaroWrinkler(alt, name)
+			if currWeight > it.weight {
+				it.weight = currWeight
+			}
 		}
-	}
-	return out
-}
-
-func (s *searcher) TopELAlts(limit int, name string) []EL {
-	name = precompute(name)
-
-	s.RLock()
-	defer s.RUnlock()
-
-	if len(s.ELs) == 0 {
-		return nil
-	}
-	xs := newLargest(limit)
-
-	for _, el := range s.ELs {
-		for _, alt := range el.Entity.AlternateNames {
-			xs.add(&item{
-				value:  el,
-				weight: jaroWrinkler(alt, name),
-			})
-		}
+		xs.add(it)
 	}
 
 	out := make([]EL, 0)

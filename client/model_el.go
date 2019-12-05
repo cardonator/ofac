@@ -8,7 +8,8 @@
  */
 
 package openapi
-// El Entity List (EL) - Bureau of Industry and Security
+
+// Entity List (EL) - Bureau of Industry and Security
 type El struct {
 	// The name of the entity
 	Name string `json:"name,omitempty"`

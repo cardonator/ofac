@@ -153,18 +153,13 @@ func searchViaQ(logger log.Logger, searcher *searcher, name string) http.Handler
 
 		limit := extractSearchLimit(r)
 
-		ssis := searcher.TopSSIs(limit, name)
-		ssis = append(ssis, searcher.TopSSIAlts(limit, name)...)
-		els := searcher.TopELs(limit, name)
-		els = append(els, searcher.TopELAlts(limit, name)...)
-
 		response := &searchResponse{
 			SDNs:              searcher.TopSDNs(limit, name),
 			AltNames:          searcher.TopAltNames(limit, name),
 			Addresses:         searcher.TopAddresses(limit, name),
 			DeniedPersons:     searcher.TopDPs(limit, name),
-			SectoralSanctions: ssis,
-			BISEntities:       els,
+			SectoralSanctions: searcher.TopSSIs(limit, name),
+			BISEntities:       searcher.TopELs(limit, name),
 		}
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(http.StatusOK)
@@ -214,15 +209,11 @@ func searchByAltName(logger log.Logger, searcher *searcher, altSlug string) http
 
 		limit := extractSearchLimit(r)
 		alts := searcher.TopAltNames(limit, altSlug)
-		ssiAlts := searcher.TopSSIAlts(limit, altSlug)
-		elAlts := searcher.TopELAlts(limit, altSlug)
 
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(http.StatusOK)
 		err := json.NewEncoder(w).Encode(&searchResponse{
-			AltNames:          alts,
-			SectoralSanctions: ssiAlts,
-			BISEntities:       elAlts,
+			AltNames: alts,
 		})
 		if err != nil {
 			moovhttp.Problem(w, err)

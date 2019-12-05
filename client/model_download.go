@@ -8,13 +8,15 @@
  */
 
 package openapi
+
 import (
 	"time"
 )
-// Download Metadata and stats about downloaded OFAC data
+
+// Metadata and stats about downloaded OFAC data
 type Download struct {
-	SDNs int32 `json:"SDNs,omitempty"`
-	AltNames int32 `json:"altNames,omitempty"`
-	Addresses int32 `json:"addresses,omitempty"`
+	SDNs      int32     `json:"SDNs,omitempty"`
+	AltNames  int32     `json:"altNames,omitempty"`
+	Addresses int32     `json:"addresses,omitempty"`
 	Timestamp time.Time `json:"timestamp,omitempty"`
 }

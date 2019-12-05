@@ -8,7 +8,8 @@
  */
 
 package openapi
-// UpdateCustomerStatus Request body to update a customers status.
+
+// Request body to update a customers status.
 type UpdateCustomerStatus struct {
 	// manual override of customer/SDN sanction status
 	Status string `json:"status"`

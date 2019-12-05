@@ -242,7 +242,7 @@ func TestSearch__Name(t *testing.T) {
 	if wrapper.DPs[0].Name != "AL NASER WINGS AIRLINES" {
 		t.Errorf("%#v", wrapper.DPs[0])
 	}
-	if wrapper.ELs[0].Name != "Mohammad Jan Khan Mangal" {
+	if wrapper.ELs[0].Name != "Luqman Yasin Yunus Shgragi" {
 		t.Errorf("%#v", wrapper.ELs[0])
 	}
 }
@@ -254,8 +254,6 @@ func TestSearch__AltName(t *testing.T) {
 	router := mux.NewRouter()
 	addSearchRoutes(nil, router, &searcher{
 		Alts: altSearcher.Alts,
-		SSIs: ssiSearcher.SSIs,
-		ELs:  elSearcher.ELs,
 	})
 	router.ServeHTTP(w, req)
 	w.Flush()
@@ -270,22 +268,14 @@ func TestSearch__AltName(t *testing.T) {
 
 	var wrapper struct {
 		Alts []*ofac.AlternateIdentity `json:"altNames"`
-		SSIs []*ofac.SSI               `json:"sectoralSanctions"`
-		ELs  []*ofac.EL                `json:"bisEntities"`
 	}
 	if err := json.NewDecoder(w.Body).Decode(&wrapper); err != nil {
 		t.Fatal(err)
 	}
-	if len(wrapper.Alts) != 1 || len(wrapper.SSIs) != 1 {
-		t.Fatalf("Alts=%d SSIs=%d", len(wrapper.Alts), len(wrapper.SSIs))
+	if len(wrapper.Alts) != 1 {
+		t.Fatalf("Alts=%d", len(wrapper.Alts))
 	}
 	if wrapper.Alts[0].EntityID != "4691" {
 		t.Errorf("%#v", wrapper.Alts[0])
-	}
-	if wrapper.SSIs[0].EntityID != "18782" {
-		t.Errorf("%#v", wrapper.SSIs[0])
-	}
-	if wrapper.ELs[0].Name != "Luqman Yasin Yunus Shgragi" {
-		t.Errorf("%#v", wrapper.ELs[0])
 	}
 }

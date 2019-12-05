@@ -8,7 +8,8 @@
  */
 
 package openapi
-// Dpl BIS Denied Persons List item
+
+// BIS Denied Persons List item
 type Dpl struct {
 	// Name of the Denied Person
 	Name string `json:"name,omitempty"`
@@ -33,6 +34,6 @@ type Dpl struct {
 	// Most recent action taken regarding the denial
 	Action string `json:"action,omitempty"`
 	// Reference to the order's citation in the Federal Register
-	FrCitation string `json:"frCitation,omitempty"`
-	Match float32 `json:"match,omitempty"`
+	FrCitation string  `json:"frCitation,omitempty"`
+	Match      float32 `json:"match,omitempty"`
 }

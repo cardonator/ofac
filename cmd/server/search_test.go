@@ -9,7 +9,6 @@ import (
 	"math"
 	"net/http/httptest"
 	"net/url"
-	"reflect"
 	"testing"
 
 	"github.com/cardonator/ofac"
@@ -136,7 +135,7 @@ var (
 		ELs: precomputeELs([]*ofac.EL{
 			{
 				Name:               "Mohammad Jan Khan Mangal",
-				AlternateNames:     []string{""},
+				AlternateNames:     []string{"Air I"},
 				Addresses:          []string{"Kolola Pushta, Charahi Gul-e-Surkh, Kabul, AF", "Maidan Sahr, Hetefaq Market, Paktiya, AF"},
 				StartDate:          "11/13/19",
 				LicenceRequirement: "For all items subject to the EAR (See ¬ß744.11 of the EAR). ",
@@ -403,27 +402,6 @@ func TestSearch__TopSdnAlts(t *testing.T) {
 	}
 }
 
-func TestSearcher_TopSSIAlts(t *testing.T) {
-	ssis := ssiSearcher.TopSSIAlts(1, "ROSOBORONEXPORT")
-	if len(ssis) == 0 {
-		t.Fatal("empty SSIs")
-	}
-	if ssis[0].SectoralSanction.Name != "ROSOBORONEKSPORT OAO" {
-		t.Errorf("%#v", ssis[0].SectoralSanction)
-	}
-}
-
-func TestSearcher_TopELAlts(t *testing.T) {
-	els := elSearcher.TopELAlts(1, "Lkemanasel")
-	if len(els) == 0 {
-		t.Fatal("emtpy ELs")
-	}
-	expectedAlts := []string{"Lkemanasel Yosef", "Luqman Sehreci."}
-	if els[0].Entity.Name != "Luqman Yasin Yunus Shgragi" || !reflect.DeepEqual(els[0].Entity.AlternateNames, expectedAlts) {
-		t.Errorf("%#v", els[0].Entity)
-	}
-}
-
 func TestSearch__FindSDN(t *testing.T) {
 	sdn := sdnSearcher.FindSDN("2676")
 	if sdn == nil {
@@ -466,7 +444,7 @@ func TestSearcher_TopSSIs(t *testing.T) {
 }
 
 func TestSearcher_TopELs(t *testing.T) {
-	els := elSearcher.TopELs(1, "Khan")
+	els := elSearcher.TopELs(1, "Mohammad")
 	if len(els) == 0 {
 		t.Fatal("empty ELs")
 	}

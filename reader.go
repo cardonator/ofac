@@ -41,7 +41,8 @@ const (
 	consolidatedScreeningListFile = "csl.csv"
 
 	// Lists to extract from the Consolidated Screening List:
-	ssiListName = "Sectoral Sanctions Identifications List (SSI) - Treasury Department"
+	ssiListName       = "Sectoral Sanctions Identifications List (SSI) - Treasury Department"
+	bisEntityListName = "Entity List (EL) - Bureau of Industry and Security"
 )
 
 // This is the order of the columns in the CSL
@@ -113,6 +114,9 @@ type Reader struct {
 	DeniedPersons []*DPL
 	// SectoralSanctions returns an array of Treasury Dept. Sectoral Sanctions Identifications
 	SectoralSanctions []*SSI
+	// BISEntities returns an array of Bureau of Industry and Security Entities
+	BISEntities []*EL
+
 	// errors holds each error encountered when attempting to parse the file
 	errors base.ErrorList
 }
@@ -322,6 +326,8 @@ func (r *Reader) csvConsolidatedScreeningList() error {
 		switch csvLine[cslSource] {
 		case ssiListName:
 			r.SectoralSanctions = append(r.SectoralSanctions, unmarshalSSI(csvLine))
+		case bisEntityListName:
+			r.BISEntities = append(r.BISEntities, unmarshalEL(csvLine))
 		default:
 			continue
 		}
@@ -341,6 +347,20 @@ func unmarshalSSI(row []string) *SSI {
 		IDsOnRecord:    expandField(row[cslIds]),
 		SourceListURL:  row[cslSourceListURL],
 		SourceInfoURL:  row[cslSourceInformationURL],
+	}
+}
+
+func unmarshalEL(row []string) *EL {
+	return &EL{
+		Name:               row[cslName],
+		Addresses:          expandField(row[cslAddresses]),
+		AlternateNames:     expandField(row[cslAltNames]),
+		StartDate:          row[cslStartDate],
+		LicenceRequirement: row[cslLicenseRequirement],
+		LicensePolicy:      row[cslLicensePolicy],
+		FRNotice:           row[cslFRNotice],
+		SourceListURL:      row[cslSourceListURL],
+		SourceInfoURL:      row[cslSourceInformationURL],
 	}
 }
 

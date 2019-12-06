@@ -37,6 +37,7 @@ type searcher struct {
 	Alts         []*Alt
 	DPs          []*DP
 	SSIs         []*SSI
+	ELs          []*EL
 	sync.RWMutex // protects all above fields
 
 	logger log.Logger
@@ -293,6 +294,9 @@ func (s *searcher) TopSSIs(limit int, name string) []SSI {
 			weight: jaroWrinkler(ssi.name, name),
 		}
 		for _, alt := range ssi.SectoralSanction.AlternateNames {
+			if alt == "" {
+				continue
+			}
 			currWeight := jaroWrinkler(alt, name)
 			if currWeight > it.weight {
 				it.weight = currWeight
@@ -311,6 +315,49 @@ func (s *searcher) TopSSIs(limit int, name string) []SSI {
 			ssi := *ss
 			ssi.match = v.weight
 			out = append(out, ssi)
+		}
+	}
+	return out
+}
+
+func (s *searcher) TopELs(limit int, name string) []EL {
+	name = precompute(name)
+
+	s.RLock()
+	defer s.RUnlock()
+
+	if len(s.ELs) == 0 {
+		return nil
+	}
+	xs := newLargest(limit)
+
+	for _, el := range s.ELs {
+		it := &item{
+			value:  el,
+			weight: jaroWrinkler(el.name, name),
+		}
+		for _, alt := range el.Entity.AlternateNames {
+			if alt == "" {
+				continue
+			}
+			currWeight := jaroWrinkler(alt, name)
+			if currWeight > it.weight {
+				it.weight = currWeight
+			}
+		}
+		xs.add(it)
+	}
+
+	out := make([]EL, 0)
+	for _, thisItem := range xs.items {
+		if v := thisItem; v != nil {
+			ss, ok := v.value.(*EL)
+			if !ok {
+				continue
+			}
+			el := *ss
+			el.match = v.weight
+			out = append(out, el)
 		}
 	}
 	return out
@@ -488,6 +535,33 @@ func precomputeSSIs(ssis []*ofac.SSI) []*SSI {
 		out[i] = &SSI{
 			SectoralSanction: ssi,
 			name:             precompute(reorderSDNName(ssi.Name, ssi.Type)),
+		}
+	}
+	return out
+}
+
+type EL struct {
+	Entity *ofac.EL
+	match  float64
+	name   string
+}
+
+func (e EL) MarshalJSON() ([]byte, error) {
+	return json.Marshal(struct {
+		*ofac.EL
+		Match float64 `json:"match"`
+	}{
+		e.Entity,
+		e.match,
+	})
+}
+
+func precomputeELs(els []*ofac.EL) []*EL {
+	out := make([]*EL, len(els))
+	for i, el := range els {
+		out[i] = &EL{
+			Entity: el,
+			name:   precompute(el.Name),
 		}
 	}
 	return out

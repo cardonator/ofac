@@ -9,6 +9,7 @@ Name | Type | Description | Notes
 **Addresses** | [**[]Address**](Address.md) |  | [optional] 
 **DeniedPersons** | [**[]Dpl**](DPL.md) |  | [optional] 
 **SectoralSanctions** | [**[]Ssi**](SSI.md) |  | [optional] 
+**BisEntities** | [**[]El**](EL.md) |  | [optional] 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

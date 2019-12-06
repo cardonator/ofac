@@ -62,7 +62,7 @@ func search(logger log.Logger, searcher *searcher) http.HandlerFunc {
 		// Search by Name
 		if name := strings.TrimSpace(r.URL.Query().Get("name")); name != "" {
 			if logger != nil {
-				logger.Log("search", fmt.Sprintf("searching SDN names for %s", name))
+				logger.Log("search", fmt.Sprintf("searching names for %s", name))
 			}
 			searchByName(logger, searcher, name)(w, r)
 			return
@@ -71,7 +71,7 @@ func search(logger log.Logger, searcher *searcher) http.HandlerFunc {
 		// Search by Alt Name
 		if alt := strings.TrimSpace(r.URL.Query().Get("altName")); alt != "" {
 			if logger != nil {
-				logger.Log("search", fmt.Sprintf("searching SDN alt names for %s", alt))
+				logger.Log("search", fmt.Sprintf("searching known aliases for %s", alt))
 			}
 			searchByAltName(logger, searcher, alt)(w, r)
 			return
@@ -97,6 +97,7 @@ type searchResponse struct {
 	Addresses         []Address `json:"addresses"`
 	DeniedPersons     []DP      `json:"deniedPersons"`
 	SectoralSanctions []SSI     `json:"sectoralSanctions"`
+	BISEntities       []EL      `json:"bisEntities"`
 }
 
 func searchByAddress(logger log.Logger, searcher *searcher, req addressSearchRequest) http.HandlerFunc {
@@ -158,6 +159,7 @@ func searchViaQ(logger log.Logger, searcher *searcher, name string) http.Handler
 			Addresses:         searcher.TopAddresses(limit, name),
 			DeniedPersons:     searcher.TopDPs(limit, name),
 			SectoralSanctions: searcher.TopSSIs(limit, name),
+			BISEntities:       searcher.TopELs(limit, name),
 		}
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(http.StatusOK)
@@ -180,6 +182,7 @@ func searchByName(logger log.Logger, searcher *searcher, nameSlug string) http.H
 		sdns := searcher.TopSDNs(limit, nameSlug)
 		dps := searcher.TopDPs(limit, nameSlug)
 		ssis := searcher.TopSSIs(limit, nameSlug)
+		els := searcher.TopELs(limit, nameSlug)
 
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(http.StatusOK)
@@ -187,6 +190,7 @@ func searchByName(logger log.Logger, searcher *searcher, nameSlug string) http.H
 			SDNs:              sdns,
 			DeniedPersons:     dps,
 			SectoralSanctions: ssis,
+			BISEntities:       els,
 		})
 		if err != nil {
 			moovhttp.Problem(w, err)

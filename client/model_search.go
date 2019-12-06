@@ -16,4 +16,5 @@ type Search struct {
 	Addresses         []Address `json:"addresses,omitempty"`
 	DeniedPersons     []Dpl     `json:"deniedPersons,omitempty"`
 	SectoralSanctions []Ssi     `json:"sectoralSanctions,omitempty"`
+	BisEntities       []El      `json:"bisEntities,omitempty"`
 }

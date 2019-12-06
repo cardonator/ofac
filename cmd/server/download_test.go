@@ -66,7 +66,7 @@ func TestDownload_record(t *testing.T) {
 	repo := createTestDownloadRepository(t)
 	defer repo.close()
 
-	stats := &downloadStats{1, 12, 42, 13, 30}
+	stats := &downloadStats{1, 12, 42, 13, 30, 3}
 	if err := repo.recordStats(stats); err != nil {
 		t.Fatal(err)
 	}
@@ -94,6 +94,9 @@ func TestDownload_record(t *testing.T) {
 	if dl.SectoralSanctions != stats.SectoralSanctions {
 		t.Errorf("dl.SectoralSanctions=%d stats.SectoralSanctions=%d", dl.SectoralSanctions, stats.SectoralSanctions)
 	}
+	if dl.BISEntities != stats.BISEntities {
+		t.Errorf("dl.ELs=%d stats.ELs=%d", dl.BISEntities, stats.BISEntities)
+	}
 }
 
 func TestDownload_route(t *testing.T) {
@@ -105,7 +108,9 @@ func TestDownload_route(t *testing.T) {
 	defer repo.close()
 
 	// save a record
-	repo.recordStats(&downloadStats{1, 421, 1511, 731, 230})
+	if err := repo.recordStats(&downloadStats{1, 421, 1511, 731, 230, 32}); err != nil {
+		t.Fatalf("%T: %s", err, err)
+	}
 
 	router := mux.NewRouter()
 	addDownloadRoutes(nil, router, repo)

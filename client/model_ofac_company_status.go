@@ -8,16 +8,18 @@
  */
 
 package openapi
+
 import (
 	"time"
 )
-// OfacCompanyStatus Status properties of an OFAC Company
+
+// Status properties of an OFAC Company
 type OfacCompanyStatus struct {
 	// User ID provided when updating status
 	UserId string `json:"userId,omitempty"`
 	// Optional note from updating status
 	Note string `json:"note,omitempty"`
 	// Manually applied status for OFAC Company
-	Status string `json:"status,omitempty"`
+	Status    string    `json:"status,omitempty"`
 	CreatedAt time.Time `json:"createdAt,omitempty"`
 }

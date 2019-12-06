@@ -61,6 +61,15 @@ func TestDPLTXTFileRead(t *testing.T) {
 	}
 }
 
+func TestConsolidatedListCSVFileRead(t *testing.T) {
+	r := Reader{}
+
+	r.FileName = "test/testdata/csl.csv"
+	if err := r.Read(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+}
+
 // TestInvalidFileExtension validates the file extension is csv
 func TestInvalidFileExtension(t *testing.T) {
 	r := Reader{}
@@ -153,6 +162,18 @@ func TestDPLTXTFileJSON(t *testing.T) {
 	}
 
 	if _, err := json.Marshal(r.DeniedPersons); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+}
+
+func TestCSLCSVFileJSON(t *testing.T) {
+	r := Reader{FileName: "test/testdata/csl.csv"}
+
+	if err := r.Read(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	if _, err := json.Marshal(r.SectoralSanctions); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
 }

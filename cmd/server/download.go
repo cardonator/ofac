@@ -35,18 +35,20 @@ func init() {
 // Download holds counts for each type of OFAC and BIS Denied Persons List data parsed from files and a
 // timestamp of when the download happened.
 type Download struct {
-	Timestamp     time.Time `json:"timestamp"`
-	SDNs          int       `json:"SDNs"`
-	Alts          int       `json:"altNames"`
-	Addresses     int       `json:"addresses"`
-	DeniedPersons int       `json:"deniedPersons"`
+	Timestamp         time.Time `json:"timestamp"`
+	SDNs              int       `json:"SDNs"`
+	Alts              int       `json:"altNames"`
+	Addresses         int       `json:"addresses"`
+	DeniedPersons     int       `json:"deniedPersons"`
+	SectoralSanctions int       `json:"sectoralSanctions"`
 }
 
 type downloadStats struct {
-	SDNs          int `json:"SDNs"`
-	Alts          int `json:"altNames"`
-	Addresses     int `json:"addresses"`
-	DeniedPersons int `json:"deniedPersons"`
+	SDNs              int `json:"SDNs"`
+	Alts              int `json:"altNames"`
+	Addresses         int `json:"addresses"`
+	DeniedPersons     int `json:"deniedPersons"`
+	SectoralSanctions int `json:"sectoralSanctions"`
 }
 
 // periodicDataRefresh will forever block for interval's duration and then download and reparse the OFAC data.
@@ -57,12 +59,13 @@ func (s *searcher) periodicDataRefresh(interval time.Duration, downloadRepo down
 		stats, err := s.refreshData()
 		if err != nil {
 			if s.logger != nil {
-				s.logger.Log("main", fmt.Sprintf("ERROR: refreshing OFAC and/or BIS DPL data: %v", err))
+				s.logger.Log("main", fmt.Sprintf("ERROR: refreshing sanctions lists: %v", err))
 			}
 		} else {
 			downloadRepo.recordStats(stats)
 			if s.logger != nil {
-				s.logger.Log("main", fmt.Sprintf("OFAC and BIS DPL data refreshed - Addresses=%d AltNames=%d SDNs=%d DPL=%d", stats.Addresses, stats.Alts, stats.SDNs, stats.DeniedPersons))
+				s.logger.Log("main", fmt.Sprintf("Sanctions lists refreshed - Addresses=%d AltNames=%d SDNs=%d DPL=%d SectoralSanctions=%d",
+					stats.Addresses, stats.Alts, stats.SDNs, stats.DeniedPersons, stats.SectoralSanctions))
 			}
 			updates <- stats // send stats for re-search and watch notifications
 		}
@@ -73,13 +76,13 @@ func (s *searcher) periodicDataRefresh(interval time.Duration, downloadRepo down
 // files and then runs ofac.Reader to parse and index data for searches.
 func (s *searcher) refreshData() (*downloadStats, error) {
 	if s.logger != nil {
-		s.logger.Log("download", "Starting refresh of OFAC and DPL data")
+		s.logger.Log("download", "Starting refresh of sanctions lists")
 	}
 
 	// Download files
 	dir, err := (&ofac.Downloader{}).GetFiles()
 	if err != nil {
-		return nil, fmt.Errorf("ERROR: downloading OFAC and DPL data: %v", err)
+		return nil, fmt.Errorf("ERROR: downloading sanctions lists: %v", err)
 	}
 
 	// Parse each file
@@ -100,18 +103,24 @@ func (s *searcher) refreshData() (*downloadStats, error) {
 	if err := r.Read(); err != nil {
 		return nil, fmt.Errorf("ERROR: reading dpl.txt: %v", err)
 	}
+	r.FileName = filepath.Join(dir, "csl.csv")
+	if err := r.Read(); err != nil {
+		return nil, fmt.Errorf("ERROR: reading csl.csv: %v", err)
+	}
 
 	// Precompute new data once for slight performance win
 	sdns := precomputeSDNs(r.SDNs)
 	adds := precomputeAddresses(r.Addresses)
 	alts := precomputeAlts(r.AlternateIdentities)
 	dps := precomputeDPs(r.DeniedPersons)
+	ssis := precomputeSSIs(r.SectoralSanctions)
 
 	stats := &downloadStats{
-		SDNs:          len(sdns),
-		Alts:          len(alts),
-		Addresses:     len(adds),
-		DeniedPersons: len(dps),
+		SDNs:              len(sdns),
+		Alts:              len(alts),
+		Addresses:         len(adds),
+		DeniedPersons:     len(dps),
+		SectoralSanctions: len(ssis),
 	}
 
 	// Set new records after precomputation (to minimize lock contention)
@@ -120,10 +129,11 @@ func (s *searcher) refreshData() (*downloadStats, error) {
 	s.Addresses = adds
 	s.Alts = alts
 	s.DPs = dps
+	s.SSIs = ssis
 	s.Unlock()
 
 	if s.logger != nil {
-		s.logger.Log("download", "Finished refresh of OFAC and DPL data")
+		s.logger.Log("download", "Finished refresh of sanctions lists")
 	}
 
 	// record successful data refresh
@@ -174,19 +184,19 @@ func (r *sqliteDownloadRepository) recordStats(stats *downloadStats) error {
 		return errors.New("recordStats: nil downloadStats")
 	}
 
-	query := `insert into ofac_download_stats (downloaded_at, sdns, alt_names, addresses, denied_persons) values (?, ?, ?, ?, ?);`
+	query := `insert into ofac_download_stats (downloaded_at, sdns, alt_names, addresses, denied_persons, sectoral_sanctions) values (?, ?, ?, ?, ?, ?);`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
 		return err
 	}
 	defer stmt.Close()
 
-	_, err = stmt.Exec(time.Now(), stats.SDNs, stats.Alts, stats.Addresses, stats.DeniedPersons)
+	_, err = stmt.Exec(time.Now(), stats.SDNs, stats.Alts, stats.Addresses, stats.DeniedPersons, stats.SectoralSanctions)
 	return err
 }
 
 func (r *sqliteDownloadRepository) latestDownloads(limit int) ([]Download, error) {
-	query := `select downloaded_at, sdns, alt_names, addresses, denied_persons from ofac_download_stats order by downloaded_at desc limit ?;`
+	query := `select downloaded_at, sdns, alt_names, addresses, denied_persons, sectoral_sanctions from ofac_download_stats order by downloaded_at desc limit ?;`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
 		return nil, err
@@ -202,7 +212,7 @@ func (r *sqliteDownloadRepository) latestDownloads(limit int) ([]Download, error
 	var downloads []Download
 	for rows.Next() {
 		var dl Download
-		if err := rows.Scan(&dl.Timestamp, &dl.SDNs, &dl.Alts, &dl.Addresses, &dl.DeniedPersons); err == nil {
+		if err := rows.Scan(&dl.Timestamp, &dl.SDNs, &dl.Alts, &dl.Addresses, &dl.DeniedPersons, &dl.SectoralSanctions); err == nil {
 			downloads = append(downloads, dl)
 		}
 	}

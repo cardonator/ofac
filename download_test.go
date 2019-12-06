@@ -24,14 +24,14 @@ func TestDownloader(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	numFiles := len(ofacFilenames) + len(dplFilenames)
+	numFiles := len(ofacFilenames) + len(dplFilenames) + len([]string{"csl.csv"})
 	if len(fds) != numFiles {
 		t.Errorf("OAFC: expected %d files but found %d", len(fds), numFiles)
 	}
 	for i := range fds {
 		name := fds[i].Name()
 		switch name {
-		case "add.csv", "alt.csv", "sdn.csv", "sdn_comments.csv", "dpl.txt":
+		case "add.csv", "alt.csv", "sdn.csv", "sdn_comments.csv", "dpl.txt", "csl.csv":
 			continue
 		default:
 			t.Errorf("unknown file %s", name)

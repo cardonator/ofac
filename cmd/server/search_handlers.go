@@ -92,10 +92,11 @@ func search(logger log.Logger, searcher *searcher) http.HandlerFunc {
 }
 
 type searchResponse struct {
-	SDNs          []SDN     `json:"SDNs"`
-	AltNames      []Alt     `json:"altNames"`
-	Addresses     []Address `json:"addresses"`
-	DeniedPersons []DP      `json:"deniedPersons"`
+	SDNs              []SDN     `json:"SDNs"`
+	AltNames          []Alt     `json:"altNames"`
+	Addresses         []Address `json:"addresses"`
+	DeniedPersons     []DP      `json:"deniedPersons"`
+	SectoralSanctions []SSI     `json:"sectoralSanctions"`
 }
 
 func searchByAddress(logger log.Logger, searcher *searcher, req addressSearchRequest) http.HandlerFunc {
@@ -150,11 +151,13 @@ func searchViaQ(logger log.Logger, searcher *searcher, name string) http.Handler
 		}
 
 		limit := extractSearchLimit(r)
+
 		response := &searchResponse{
-			SDNs:          searcher.TopSDNs(limit, name),
-			AltNames:      searcher.TopAltNames(limit, name),
-			Addresses:     searcher.TopAddresses(limit, name),
-			DeniedPersons: searcher.TopDPs(limit, name),
+			SDNs:              searcher.TopSDNs(limit, name),
+			AltNames:          searcher.TopAltNames(limit, name),
+			Addresses:         searcher.TopAddresses(limit, name),
+			DeniedPersons:     searcher.TopDPs(limit, name),
+			SectoralSanctions: searcher.TopSSIs(limit, name),
 		}
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(http.StatusOK)
@@ -173,11 +176,19 @@ func searchByName(logger log.Logger, searcher *searcher, nameSlug string) http.H
 			return
 		}
 
-		sdns := searcher.TopSDNs(extractSearchLimit(r), nameSlug)
+		limit := extractSearchLimit(r)
+		sdns := searcher.TopSDNs(limit, nameSlug)
+		dps := searcher.TopDPs(limit, nameSlug)
+		ssis := searcher.TopSSIs(limit, nameSlug)
 
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(http.StatusOK)
-		if err := json.NewEncoder(w).Encode(&searchResponse{SDNs: sdns}); err != nil {
+		err := json.NewEncoder(w).Encode(&searchResponse{
+			SDNs:              sdns,
+			DeniedPersons:     dps,
+			SectoralSanctions: ssis,
+		})
+		if err != nil {
 			moovhttp.Problem(w, err)
 			return
 		}
@@ -192,11 +203,15 @@ func searchByAltName(logger log.Logger, searcher *searcher, altSlug string) http
 			return
 		}
 
-		alts := searcher.TopAltNames(extractSearchLimit(r), altSlug)
+		limit := extractSearchLimit(r)
+		alts := searcher.TopAltNames(limit, altSlug)
 
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(http.StatusOK)
-		if err := json.NewEncoder(w).Encode(&searchResponse{AltNames: alts}); err != nil {
+		err := json.NewEncoder(w).Encode(&searchResponse{
+			AltNames: alts,
+		})
+		if err != nil {
 			moovhttp.Problem(w, err)
 			return
 		}

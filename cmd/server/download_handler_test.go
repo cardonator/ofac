@@ -37,4 +37,16 @@ func TestDownload__manualRefreshPath(t *testing.T) {
 	if stats.SDNs == 0 {
 		t.Errorf("stats.SDNs=%d but expected non-zero", stats.SDNs)
 	}
+	if stats.Alts == 0 {
+		t.Errorf("stats.Alts=%d but expected non-zero", stats.Alts)
+	}
+	if stats.Addresses == 0 {
+		t.Errorf("stats.Addresses=%d but expected non-zero", stats.Addresses)
+	}
+	if stats.DeniedPersons == 0 {
+		t.Errorf("stats.DeniedPersons=%d but expected non-zero", stats.DeniedPersons)
+	}
+	if stats.SectoralSanctions == 0 {
+		t.Errorf("stats.SectoralSanctions=%d but expected non-zero", stats.SectoralSanctions)
+	}
 }

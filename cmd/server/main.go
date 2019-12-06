@@ -126,11 +126,12 @@ func main() {
 		logger: logger,
 	}
 	if stats, err := searcher.refreshData(); err != nil {
-		logger.Log("main", fmt.Sprintf("ERROR: failed to download/parse initial OFAC data: %v", err))
+		logger.Log("main", fmt.Sprintf("ERROR: failed to download/parse initial sanctions lists data: %v", err))
 		os.Exit(1)
 	} else {
 		downloadRepo.recordStats(stats)
-		logger.Log("main", fmt.Sprintf("OFAC data refreshed - Addresses=%d AltNames=%d SDNs=%d DeniedPersons=%d", stats.Addresses, stats.Alts, stats.SDNs, stats.DeniedPersons))
+		logger.Log("main", fmt.Sprintf("OFAC data refreshed - Addresses=%d AltNames=%d SDNs=%d DeniedPersons=%d SectoralSanctions=%d",
+			stats.Addresses, stats.Alts, stats.SDNs, stats.DeniedPersons, stats.SectoralSanctions))
 	}
 
 	// Setup Watch and Webhook database wrapper

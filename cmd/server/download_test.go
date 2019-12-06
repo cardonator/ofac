@@ -44,7 +44,10 @@ func TestSearcher__refreshData(t *testing.T) {
 		t.Errorf("empty SDNs=%d or stats.SDNs=%d", len(s.SDNs), stats.SDNs)
 	}
 	if len(s.DPs) == 0 || stats.DeniedPersons == 0 {
-		t.Errorf("empty DPs=%d or status.DeniedPersons=%d", len(s.DPs), stats.DeniedPersons)
+		t.Errorf("empty DPs=%d or stats.DeniedPersons=%d", len(s.DPs), stats.DeniedPersons)
+	}
+	if len(s.SSIs) == 0 || stats.SectoralSanctions == 0 {
+		t.Errorf("empty SSIs=%d or stats.SectoralSanctions=%d", len(s.SSIs), stats.SectoralSanctions)
 	}
 }
 
@@ -63,7 +66,7 @@ func TestDownload_record(t *testing.T) {
 	repo := createTestDownloadRepository(t)
 	defer repo.close()
 
-	stats := &downloadStats{1, 12, 42, 13}
+	stats := &downloadStats{1, 12, 42, 13, 30}
 	if err := repo.recordStats(stats); err != nil {
 		t.Fatal(err)
 	}
@@ -88,6 +91,9 @@ func TestDownload_record(t *testing.T) {
 	if dl.DeniedPersons != stats.DeniedPersons {
 		t.Errorf("dl.DeniedPersons=%d stats.DeniedPersons=%d", dl.DeniedPersons, stats.DeniedPersons)
 	}
+	if dl.SectoralSanctions != stats.SectoralSanctions {
+		t.Errorf("dl.SectoralSanctions=%d stats.SectoralSanctions=%d", dl.SectoralSanctions, stats.SectoralSanctions)
+	}
 }
 
 func TestDownload_route(t *testing.T) {
@@ -99,7 +105,7 @@ func TestDownload_route(t *testing.T) {
 	defer repo.close()
 
 	// save a record
-	repo.recordStats(&downloadStats{1, 421, 1511, 731})
+	repo.recordStats(&downloadStats{1, 421, 1511, 731, 230})
 
 	router := mux.NewRouter()
 	addDownloadRoutes(nil, router, repo)

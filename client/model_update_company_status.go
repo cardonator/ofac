@@ -8,7 +8,8 @@
  */
 
 package openapi
-// UpdateCompanyStatus Request body to update a company status.
+
+// Request body to update a company status.
 type UpdateCompanyStatus struct {
 	// manual override of company/SDN sanction status
 	Status string `json:"status"`

@@ -28,7 +28,7 @@ var (
 	}
 	dplURLTemplate = "https://www.bis.doc.gov/dpl/%s"
 
-	cslURL = "https://api.trade.gov/consolidated_screening_list/search.csv?api_key=OHZYuksFHSFao8jDXTkfiypO"
+	cslURL = "http://api.trade.gov/static/consolidated_screening_list/consolidated.csv"
 )
 
 func init() {
